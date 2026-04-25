@@ -1,0 +1,6 @@
+{
+  "name": "clanka",
+  "version": "0.1.0",
+  "description": "Multi-agent orchestration framework for Claude Code. Boot with `claude --agent orchestrator` to enable swarm mode: a coordinator that classifies user intent and delegates to specialist subagents (explorer, librarian, oracle, planner, scope-analyst, critic, code-reviewer, frontend, document-writer, viewer, general).",
+  "license": "MIT"
+}
