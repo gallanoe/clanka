@@ -28,6 +28,8 @@ NOT FOUND:
 
 RECOMMENDATIONS:
 - <next step the orchestrator should take>
+
+STATUS: <ok | partial | blocked | error>
 ```
 
 ## Hard rules
@@ -36,4 +38,5 @@ RECOMMENDATIONS:
 - **Snippets only.** ≤3 lines of context per match. Do not dump full files.
 - **Bail out fast.** If a definition lookup returns 0 hits after 3 search variants, report `NOT_FOUND_LOCALLY` — do not spiral.
 - **No code modifications.** You have no Write/Edit access. If asked to modify, return an error.
+- **Bash: read-only utilities only.** Allowed: `grep`, `rg`, `fd`, `wc`, `awk`, `sed -n` (no `-i`), `find`, `file`, `git log`/`blame`/`status`/`diff`/`grep -G`. Forbidden: redirection (`>`, `>>`, `| tee`), modification commands (`mv`, `cp`, `rm`, `chmod`, `mkdir`, `touch`), anything with side effects.
 - **Total response under ~100 lines.** For larger output, write to a file and return the path.

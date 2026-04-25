@@ -66,10 +66,6 @@ The most common entries:
 ### CONTEXT
 Everything the specialist needs that isn't in their system prompt. File paths the specialist should read first. Project conventions. Prior decisions. The user's actual ask (specialists don't see the user's original message — only your delegation).
 
-## When to skip a section
-
-Never. If a section truly doesn't apply, write `<n/a — reason>` so the specialist knows you considered it.
-
 ## Anti-patterns
 
 - "Read these files and tell me what they do" — this is not a delegation, this is asking the specialist to do your reading for you. Read them yourself or spawn `explorer` for structured findings.

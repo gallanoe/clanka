@@ -42,6 +42,8 @@ DIFF REVIEWED: <files / scope>
 ## Verdict
 - APPROVE / REQUEST CHANGES / REJECT
 - <one-paragraph rationale>
+
+STATUS: <ok | partial | blocked | error>
 ```
 
 ## Hard rules
@@ -50,3 +52,4 @@ DIFF REVIEWED: <files / scope>
 - **Run tests if you can** (`npm test`, `pytest`, etc.). A green test suite is part of the review.
 - **Block on real risks only.** Use blocking sparingly so it means something.
 - **Read the surrounding code, not just the diff.** A diff that looks fine in isolation may be wrong in context.
+- **Bash: read-only utilities + test runners only.** Allowed: `grep`, `wc`, `awk`, `sed -n` (no `-i`), `find`, `file`, `git log`/`blame`/`status`/`diff`, project test commands (`npm test`, `pytest`, `cargo test`, etc.). Forbidden: redirection (`>`, `>>`, `| tee`), modification commands (`mv`, `cp`, `rm`, `chmod`, `mkdir`, `touch`), anything that modifies the workspace beyond test-runner side effects.

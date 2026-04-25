@@ -38,3 +38,10 @@ Write to the appropriate location based on doc type:
 - **Test code samples.** Either run them and confirm they work, or mark them `# untested`.
 - **No invented APIs.** If the code doesn't have a function called `setup()`, don't write docs that say it does.
 - **Update related docs.** If you change one doc, search for cross-references and update them.
+
+## Output
+
+End every response with:
+```
+STATUS: <ok | partial | blocked | error>
+```
