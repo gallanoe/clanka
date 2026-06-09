@@ -1,0 +1,12 @@
+{
+  "name": "clanka",
+  "description": "Marketplace for the clanka multi-agent orchestration plugin.",
+  "owner": { "name": "gallanoe" },
+  "plugins": [
+    {
+      "name": "clanka",
+      "description": "Multi-agent orchestration framework for Claude Code: an orchestrator agent that classifies user intent and delegates to specialist subagents.",
+      "source": "./"
+    }
+  ]
+}

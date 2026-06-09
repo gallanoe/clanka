@@ -1,6 +1,6 @@
 {
   "name": "clanka",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Multi-agent orchestration framework for Claude Code. When enabled, the orchestrator agent becomes the main thread (via settings.json), classifying user intent and delegating to specialist subagents: explorer, researcher, reasoner, planner, scope-analyst, critic, code-reviewer, frontend, document-writer, viewer, general.",
   "license": "MIT"
 }

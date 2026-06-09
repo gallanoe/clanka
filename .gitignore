@@ -1,5 +1,5 @@
 reference/
 .DS_Store
 .clanka/
-.claude/settings.local.json
-.claude/clanka/run/
+docs/
+.claude/
