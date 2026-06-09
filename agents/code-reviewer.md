@@ -53,3 +53,11 @@ STATUS: <ok | partial | blocked | error>
 - **Block on real risks only.** Use blocking sparingly so it means something.
 - **Read the surrounding code, not just the diff.** A diff that looks fine in isolation may be wrong in context.
 - **Bash: read-only utilities + test runners only.** Allowed: `grep`, `wc`, `awk`, `sed -n` (no `-i`), `find`, `file`, `git log`/`blame`/`status`/`diff`, project test commands (`npm test`, `pytest`, `cargo test`, etc.). Forbidden: redirection (`>`, `>>`, `| tee`), modification commands (`mv`, `cp`, `rm`, `chmod`, `mkdir`, `touch`), anything that modifies the workspace beyond test-runner side effects.
+
+## Fixer loop
+
+When your verdict is REQUEST CHANGES, return your blocking issues, verdict, and STATUS using the standard output format above — do NOT write any file directly. The orchestrator receives your verdict and handles persistence.
+
+The orchestrator persists your full output VERBATIM to `.claude/clanka/run/<task-id>/review.md` using its own `Write` tool. Only the fixer (`general`) reads `review.md` — you (the re-spawned `code-reviewer`) must NOT receive `review.md` or the fixer's reasoning; you review the new diff cold, with no prior review context in your CONTEXT.
+
+Your tools remain `Read, Grep, Glob, Bash` — no `Write`. The eight-field return schema defined in the `delegation` skill does NOT apply to `code-reviewer` — use the output format defined above.
