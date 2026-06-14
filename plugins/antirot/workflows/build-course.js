@@ -3,6 +3,7 @@ export const meta = {
   description: 'Fan out lesson-writers against a frozen manifest, then review each lesson adversarially as it lands.',
   whenToUse: 'Invoked by the /antirot command after the design gate and after build-artifacts has written the skeleton. Not run directly.',
   phases: [
+    { title: 'Research', detail: 'fetch real sources for grounding-required concepts before any prose is written' },
     { title: 'Write', detail: 'one lesson-writer per note, parallel; model routed by criticality' },
     { title: 'Review', detail: 'claim-level adversarial review of each lesson as soon as it is written' },
     { title: 'Cross-check', detail: 'single pass over named seams: notation, terminology, link legality' },
@@ -84,6 +85,42 @@ const SEAMS = {
   },
 }
 
+const SOURCES = {
+  type: 'object',
+  required: ['sources'],
+  additionalProperties: false,
+  properties: {
+    sources: {
+      type: 'array',
+      items: {
+        type: 'object',
+        required: ['title', 'url'],
+        additionalProperties: false,
+        properties: {
+          title: { type: 'string' },
+          url: { type: 'string' },
+          kind: { enum: ['paper', 'book', 'docs', 'reference', 'tutorial', 'other'] },
+          note: { type: 'string' },
+        },
+      },
+    },
+  },
+}
+
+// concept id -> [sources]; populated by the research phase, read by writers/reviewers.
+const sourcesByConcept = new Map()
+
+function sourcesFor(n) {
+  const ids = new Set((n.beats ?? []).map((b) => b.concept).concat(n.prereqs ?? []))
+  const lines = []
+  for (const id of ids) {
+    const ss = sourcesByConcept.get(id)
+    if (ss && ss.length)
+      lines.push(`  ${id}:\n${ss.map((s) => `    - ${s.title} <${s.url}>${s.note ? ` — ${s.note}` : ''}`).join('\n')}`)
+  }
+  return lines.length ? lines.join('\n') : '  (none provided — ground anything you are unsure of via WebSearch/WebFetch before stating it)'
+}
+
 function prereqSummaries(n) {
   return (n.prereqs ?? [])
     .map((id) => {
@@ -113,12 +150,29 @@ function writePrompt(n) {
     `NOTATION TABLE (use these exact symbols, no substitutes):`,
     (m.notation ?? []).map((e) => `  - ${e.object}: ${e.symbol}`).join('\n'),
     ``,
+    `SOURCES (ground truth — write definitions/claims to match these; cite only fetched URLs):`,
+    sourcesFor(n),
+    ``,
     `VOICE — imitate this exemplar (register: ${m.voice?.register ?? 'precise, direct'}):`,
     m.voice?.exemplar ?? '(no exemplar provided)',
     ``,
     `If you discover the manifest is wrong (a prereq is missing, a concept is mis-homed, or one "concept" is really several), DO NOT invent a link, teach it inline, or silently omit it. Return status="blocked" with an amendment instead.`,
   ].join('\n')
 }
+
+phase('Research')
+const groundingConcepts = m.concepts.filter((c) => c.groundingRequired)
+log(`research: ${groundingConcepts.length} concept(s) flagged for grounding`)
+const researched = await parallel(
+  groundingConcepts.map((c) => () =>
+    agent(
+      `Find real, authoritative, fetched sources for the concept "${c.title}" (id "${c.id}") as used in the course "${m.course.title}". ` +
+        `Capture the authoritative definition/theorem statement where the concept is correctness-critical. Return only URLs you actually fetched.`,
+      { label: `research:${c.id}`, phase: 'Research', agentType: 'antirot:researcher', model: 'sonnet', schema: SOURCES },
+    ).then((r) => ({ id: c.id, sources: r?.sources ?? [] })),
+  ),
+)
+for (const r of researched.filter(Boolean)) sourcesByConcept.set(r.id, r.sources)
 
 phase('Write')
 const results = await pipeline(
@@ -138,7 +192,8 @@ const results = await pipeline(
       `Adversarially review the lesson note "${n.slug}" ("${n.title}") in ${m.course.outDir}. ` +
         `Extract each definition/theorem/worked-example and verify it in isolation — assume it is wrong until shown right. ` +
         `Check pacing (one new concept per beat) and that no concept outside the closed vocabulary is used. ` +
-        `Do NOT rate it highly just because it reads fluently.`,
+        `Ground anything you are not independently certain of against the sources below (or fetch your own); verify cited URLs exist and support their claim. ` +
+        `Do NOT rate it highly just because it reads fluently.\n\nSOURCES:\n${sourcesFor(n)}`,
       {
         label: `review:${n.slug}`,
         phase: 'Review',
@@ -175,6 +230,9 @@ return {
   amendments,
   needsRevision,
   seamFindings: seam?.seamFindings ?? [],
+  // concept id -> sources; the command persists these into the manifest, then
+  // re-runs build-artifacts so Resources.md is generated from real citations.
+  sources: Object.fromEntries(sourcesByConcept),
 }
 
 function isCritical(n) {

@@ -20,7 +20,7 @@
 // The checker proves structure; the reviewer judges meaning.
 
 import { readFileSync, existsSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { join, resolve, dirname } from "node:path";
 import { execSync } from "node:child_process";
 import { createRequire } from "node:module";
 
@@ -103,6 +103,29 @@ for (const c of m.concepts.filter((c) => c.glossary)) {
     byObject.set(e.object, e.symbol);
     bySymbol.set(e.symbol, e.object);
   }
+}
+
+// --- citation / grounding checks -------------------------------------------
+{
+  const suspicious = /(^|\/\/)(example\.(com|org)|localhost|test\.|your-)/i;
+  for (const c of m.concepts) {
+    const sources = c.sources ?? [];
+    if (c.groundingRequired && sources.length === 0)
+      err("ungrounded", c.id, "concept is groundingRequired but has no sources — researcher pass missing or failed");
+    for (const s of sources) {
+      let u;
+      try { u = new URL(s.url); } catch {
+        err("bad-citation-url", c.id, `source "${s.title}" has a malformed URL: ${s.url}`);
+        continue;
+      }
+      if (u.protocol !== "http:" && u.protocol !== "https:")
+        err("bad-citation-url", c.id, `source "${s.title}" is not http(s): ${s.url}`);
+      if (suspicious.test(s.url))
+        warn("suspicious-citation", c.id, `source "${s.title}" looks like a placeholder/fabricated URL: ${s.url}`);
+    }
+  }
+  if (process.argv.includes("--fetch-citations"))
+    warn("citation-fetch-todo", "(optional)", "--fetch-citations set; wire HEAD reachability in a follow-up");
 }
 
 // --- per-note structural checks --------------------------------------------
@@ -211,7 +234,7 @@ const warns = findings.filter((f) => f.severity === "warn");
 const report = { ok: errors.length === 0, errors, warns, manifest: manifestPath, outDir };
 try {
   const { writeFileSync, mkdirSync } = await import("node:fs");
-  mkdirSync(join(".antirot"), { recursive: true });
+  mkdirSync(dirname(reportPath), { recursive: true });
   writeFileSync(reportPath, JSON.stringify(report, null, 2));
 } catch { /* report file is best-effort */ }
 

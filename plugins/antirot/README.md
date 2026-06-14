@@ -45,6 +45,7 @@ LLMs are most dangerous exactly where they're most fluent — confident, wrong d
 - a **deterministic checker** proves structure (it can't be sycophantic)
 - a **cold, claim-level, canary-tested** reviewer judges meaning, chunked per-lesson to avoid long-context rubber-stamping
 - a **notation/voice/already-taught contract** keeps parallel writers from drifting
+- a **research pass** fetches real sources for concepts the model may not reliably know, so writers ground definitions in fact instead of fluent recall, the reviewer verifies against them, and the Resources appendix is built from real (not hallucinated) citations
 
 ## Components
 
@@ -54,10 +55,11 @@ LLMs are most dangerous exactly where they're most fluent — confident, wrong d
 | skill | `course-design` | Pedagogy, DAG, manifest authoring, amendment protocol |
 | skill | `obsidian-authoring` | The exact Obsidian syntax the checker enforces |
 | skill | `course-review` | Claim-level, chunked, canary-calibrated review method |
-| agent | `lesson-writer` | Writes one lesson vs the frozen manifest (parallel) |
+| agent | `lesson-writer` | Writes one lesson vs the frozen manifest (parallel); grounds via web when unsure |
 | agent | `dag-critic` | Independent critique of the DAG before the gate |
-| agent | `course-reviewer` | Cold adversarial reviewer (per-lesson + seams) |
-| workflow | `build-course.js` | Fans out writers + review |
+| agent | `researcher` | Fetches real sources for grounding-required concepts |
+| agent | `course-reviewer` | Cold adversarial reviewer (per-lesson + seams); verifies against sources |
+| workflow | `build-course.js` | Research → fan out writers → review |
 | script | `build-artifacts.mjs` | Deterministic skeleton generation |
 | script | `check.mjs` | Deterministic structural + completion checks |
 

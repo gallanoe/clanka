@@ -14,6 +14,7 @@ Load the `course-design` skill. Read the outline. Produce a **build manifest** t
 - write the **beat structure** for every note (one new concept per beat) and its **closed `linkVocab`** (its beats + prereqs + glossary only)
 - author the **notation table**, the **voice spec + exemplar passage**, and each note's **alreadyTaught** ledger
 - tag concept `criticality` (`critical` = downstream correctness depends on it) and `difficulty`
+- set `groundingRequired: true` on concepts the model may not reliably know (niche, cutting-edge, low-confidence, or correctness-critical) — these get a real-source research pass before they're written
 - pick `course.outDir` (default `./<Course Title>`); confirm it with the user if ambiguous
 
 Write the manifest to `.antirot/manifest.json`. Sanity-check it parses and satisfies the schema before continuing.
@@ -35,8 +36,11 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/build-artifacts.mjs .antirot/manifest.json --
 This generates the course map (with the DAG mermaid), module overviews, glossary stubs, frontmatter, and beat-headed skeleton notes — all from the manifest, never by hand.
 
 ## 5 — Generate (tiered)
-- **≤5 lessons:** write them inline, serially, yourself — follow the `lesson-writer` agent's rules exactly (closed vocab, notation table, voice exemplar, one-new-thing-per-beat, amend-don't-invent).
-- **>5 lessons:** invoke the generation workflow. Read `.antirot/manifest.json`, parse it, and call the Workflow tool with `scriptPath: "${CLAUDE_PLUGIN_ROOT}/workflows/build-course.js"` and `args` set to the parsed manifest object. It fans out `lesson-writer`s (model routed by criticality) and runs the `course-reviewer` per lesson plus a cross-seam pass.
+- **≤5 lessons:** write them inline, serially, yourself — follow the `lesson-writer` agent's rules exactly (closed vocab, notation table, voice exemplar, one-new-thing-per-beat, amend-don't-invent). For any `groundingRequired` concept, first gather real sources (WebSearch/WebFetch — or spawn the `researcher` agent) and write definitions to match them; cite only fetched URLs.
+- **>5 lessons:** invoke the generation workflow. Read `.antirot/manifest.json`, parse it, and call the Workflow tool with `scriptPath: "${CLAUDE_PLUGIN_ROOT}/workflows/build-course.js"` and `args` set to the parsed manifest object. It runs a **research phase** (fetches sources for `groundingRequired` concepts), then fans out `lesson-writer`s (model routed by criticality) grounded in those sources, then `course-reviewer` per lesson plus a cross-seam pass.
+
+## 5b — Persist sources & rebuild Resources
+The workflow returns a `sources` map (concept id → fetched citations). Write these into `.antirot/manifest.json` under each concept's `sources`, then re-run build-artifacts (step 4) — it regenerates `Appendix/Resources.md` deterministically from the real citations (no hallucinated links). For the inline path, write the sources you gathered into the manifest the same way.
 
 ## 6 — Check
 ```

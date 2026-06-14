@@ -20,6 +20,9 @@ Do not skim a lesson and pronounce it good — that is exactly how LLM judges mi
 
 Return `revise` with specific findings on any failure; return `pass` only when you have actually checked the claims.
 
+## Ground uncertain claims — you share the writer's blind spots
+You and the writer are the same kind of model; if it confabulated a definition, the same wrong statement will look plausible to you. So do not adjudicate hard or niche claims from memory. Check them against the concept's provided **sources** (gathered by the research pass), or search and fetch an authoritative one yourself. Verify that any URL the lesson cites actually exists and actually supports the claim it's attached to — a hallucinated or mis-attributed citation is a `revise` finding. Grounding matters most exactly where the material is specialized, because that is where both you and the writer are least reliable.
+
 ## Chunk the work — don't review the whole vault at once
 Long-context review has low recall in the middle and drifts toward rubber-stamping. Review **per lesson**. The whole-course pass is reserved for **seams only**:
 - **notation** — every object rendered with its one canonical symbol everywhere

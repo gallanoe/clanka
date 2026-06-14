@@ -31,6 +31,8 @@ const statePath =
 const m = JSON.parse(readFileSync(manifestPath, "utf8"));
 const outDir = resolve(m.course.outDir);
 const conceptById = new Map(m.concepts.map((c) => [c.id, c]));
+const noteBySlug = new Map(m.notes.map((n) => [n.slug, n]));
+const moduleBySlug = new Map(m.modules.map((mod) => [mod.slug, mod]));
 
 const state = existsSync(statePath)
   ? JSON.parse(readFileSync(statePath, "utf8"))
@@ -165,17 +167,61 @@ function glossaryStub(c) {
 }
 
 function resourcesStub() {
+  // Built deterministically from manifest.concepts[].sources — real, fetched
+  // references populated by the researcher pass. Never hand-written, so no
+  // hallucinated citations. Empty until research has run.
+  const grounded = m.concepts.filter((c) => (c.sources ?? []).length);
+  const status = grounded.length ? "complete" : "skeleton";
   const fm = frontmatter({
     title: "Resources",
     type: "appendix",
     tags: ["appendix", `course/${m.course.slug}`],
-    status: "skeleton",
+    status,
   });
+
+  if (!grounded.length) {
+    return `${fm}# Resources
+
+> [!note] Going deeper
+> Populated from researched sources after the generation pass. _(none yet)_
+`;
+  }
+
+  // group concepts by module (via their home note)
+  const byModule = new Map();
+  for (const c of grounded) {
+    const home = noteBySlug.get(c.homeNote);
+    const modSlug = home ? home.module : "_";
+    if (!byModule.has(modSlug)) byModule.set(modSlug, []);
+    byModule.get(modSlug).push(c);
+  }
+  const sections = [...byModule.entries()]
+    .sort((a, b) => (moduleBySlug.get(a[0])?.order ?? 99) - (moduleBySlug.get(b[0])?.order ?? 99))
+    .map(([modSlug, concepts]) => {
+      const modTitle = moduleBySlug.get(modSlug)?.title ?? modSlug;
+      const items = concepts
+        .map((c) => {
+          const links = c.sources
+            .map((s) => `  - [${mdEscape(s.title)}](${s.url})${s.note ? ` — ${mdEscape(s.note)}` : ""}`)
+            .join("\n");
+          return `- **${mdEscape(c.title)}** ([[${c.id}]])\n${links}`;
+        })
+        .join("\n");
+      return `## ${mdEscape(modTitle)}\n\n${items}`;
+    })
+    .join("\n\n");
+
   return `${fm}# Resources
 
 > [!note] Going deeper
-> Curated external references per module — books, papers, docs. _(to be written)_
+> Curated, fetched references per concept. Generated from the build manifest — every link was verified by the research pass.
+
+${sections}
 `;
+}
+
+function mdEscape(s) {
+  return String(s).replace(/([\[\]])/g, "\\$1");
 }
 
 function skeletonNote(n) {

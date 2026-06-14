@@ -63,7 +63,23 @@
           "homeNote": { "type": "string", "description": "slug of the note where this concept is canonically defined (the unique `define` site)." },
           "difficulty": { "enum": ["intro", "applied", "theory", "proof"] },
           "criticality": { "enum": ["normal", "critical"], "description": "critical => routed to the stronger model and to claim-level review. Downstream lessons depend on its correctness." },
-          "glossary": { "type": "boolean", "description": "Has a glossary stub + is transcludable." }
+          "glossary": { "type": "boolean", "description": "Has a glossary stub + is transcludable." },
+          "groundingRequired": { "type": "boolean", "description": "If true, the generation workflow runs a researcher to attach real sources before this concept is written/reviewed. Set for niche, cutting-edge, low-confidence, or correctness-critical concepts the model may not reliably know." },
+          "sources": {
+            "type": "array",
+            "description": "Real, fetched authoritative references for this concept (populated by the researcher pass, not recalled from memory). Shared by lesson-writer (grounding + citation) and course-reviewer (verification); the Resources appendix is built from these.",
+            "items": {
+              "type": "object",
+              "required": ["title", "url"],
+              "additionalProperties": false,
+              "properties": {
+                "title": { "type": "string" },
+                "url": { "type": "string", "description": "Canonical URL, actually fetched." },
+                "kind": { "enum": ["paper", "book", "docs", "reference", "tutorial", "other"] },
+                "note": { "type": "string", "description": "One line on what this source establishes or where to read for depth." }
+              }
+            }
+          }
         }
       }
     },

@@ -28,7 +28,7 @@ The design phase converts a vague outline into a **frozen coordination manifest*
    - **notation table** — one canonical LaTeX symbol per recurring object. The single biggest source of cross-lesson drift; freeze it here.
    - **voice** — register, person, and a 1–2 paragraph **exemplar passage**. Writers imitate the exemplar; an adjective list ("fast-paced, clear") does not anchor independent samples. Write the exemplar in the actual voice you want.
    - **alreadyTaught ledger** — per note, which prereqs the reader has already seen (so the writer links instead of re-teaching).
-8. **Tag criticality & difficulty** per concept. `criticality: critical` = downstream correctness depends on it → routed to the stronger model and to claim-level review. `difficulty: proof` is treated as critical too.
+8. **Tag criticality, difficulty & grounding** per concept. `criticality: critical` = downstream correctness depends on it → routed to the stronger model and to claim-level review. `difficulty: proof` is treated as critical too. Set `groundingRequired: true` on any concept the writing model may not reliably know — niche, cutting-edge, low-confidence, or correctness-critical. Those concepts get a real-source research pass (the `researcher` agent) before they are written, and their `sources` populate the Resources appendix. Be generous here: an LLM is most fluent — and most confidently wrong — exactly on specialized material it has only seen in passing.
 9. **Pick `course.outDir`** and pacing knobs (`density`, `assumedBackground`, `timeBudgetMin`).
 
 Write the result to `.antirot/manifest.json` and confirm it satisfies the schema.
