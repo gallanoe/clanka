@@ -7,6 +7,11 @@
       "name": "clanka",
       "description": "Multi-agent orchestration framework for Claude Code: an orchestrator agent that classifies user intent and delegates to specialist subagents.",
       "source": "./plugins/clanka"
+    },
+    {
+      "name": "antirot",
+      "description": "Turns a high-level curriculum outline into a fully-written, fast-paced, Obsidian-native Markdown course via a manifest-coordinated design → generate → check pipeline.",
+      "source": "./plugins/antirot"
     }
   ]
 }

@@ -15,6 +15,7 @@ Then install any plugin below with `/plugin install <name>@clanka`.
 | Plugin | Description |
 |---|---|
 | [`clanka`](plugins/clanka) | Multi-agent orchestration framework: an orchestrator agent that classifies user intent and delegates to specialist subagents. |
+| [`antirot`](plugins/antirot) | Turns a high-level curriculum outline into a fully-written, fast-paced, Obsidian-native Markdown course via a manifest-coordinated design → generate → check pipeline. |
 
 ## Layout
 

@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "antirot/manifest.schema.json",
+  "title": "antirot build manifest",
+  "description": "The frozen coordination layer for a course build. Authored in the design phase, approved at the gate, consumed deterministically by build-artifacts.mjs and check.mjs, and passed to the build-course workflow as args. Controls names/order/structure ONLY — it is not the correctness guarantor.",
+  "type": "object",
+  "required": ["course", "concepts", "notes", "edges", "modules"],
+  "additionalProperties": false,
+  "properties": {
+    "course": {
+      "type": "object",
+      "required": ["title", "slug", "outDir"],
+      "additionalProperties": false,
+      "properties": {
+        "title": { "type": "string" },
+        "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "outDir": { "type": "string", "description": "Output directory for the vault, relative to cwd, e.g. ./Confluent-Parallel-Language-Theory" },
+        "pacing": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "density": { "enum": ["terse", "balanced", "gentle"] },
+            "assumedBackground": { "type": "string" },
+            "timeBudgetMin": { "type": "number", "description": "Target minutes per lesson" }
+          }
+        }
+      }
+    },
+    "voice": {
+      "type": "object",
+      "description": "Pillar A: the frozen voice contract every lesson-writer must imitate.",
+      "required": ["register", "person", "exemplar"],
+      "additionalProperties": false,
+      "properties": {
+        "register": { "type": "string", "description": "e.g. 'precise, direct, no validation-forward filler'" },
+        "person": { "enum": ["first", "second", "third"] },
+        "exemplar": { "type": "string", "description": "1-2 paragraph sample passage. Few-shot anchor; writers imitate this, not an adjective list." }
+      }
+    },
+    "notation": {
+      "type": "array",
+      "description": "Pillar A: canonical symbol per recurring object. check.mjs flags divergence.",
+      "items": {
+        "type": "object",
+        "required": ["object", "symbol"],
+        "additionalProperties": false,
+        "properties": {
+          "object": { "type": "string", "description": "Human name of the mathematical/technical object, e.g. 'gradient of f'" },
+          "symbol": { "type": "string", "description": "Canonical LaTeX, e.g. '\\\\nabla f'" },
+          "firstNote": { "type": "string", "description": "slug of the note that introduces it" }
+        }
+      }
+    },
+    "concepts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "homeNote"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+$", "description": "Stable concept id; also the wikilink slug for its home note." },
+          "title": { "type": "string" },
+          "homeNote": { "type": "string", "description": "slug of the note where this concept is canonically defined (the unique `define` site)." },
+          "difficulty": { "enum": ["intro", "applied", "theory", "proof"] },
+          "criticality": { "enum": ["normal", "critical"], "description": "critical => routed to the stronger model and to claim-level review. Downstream lessons depend on its correctness." },
+          "glossary": { "type": "boolean", "description": "Has a glossary stub + is transcludable." }
+        }
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["slug", "path", "title", "module", "order", "beats", "linkVocab"],
+        "additionalProperties": false,
+        "properties": {
+          "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "path": { "type": "string", "description": "Path within outDir, e.g. '02-Reduction/03-beta-reduction.md'" },
+          "title": { "type": "string" },
+          "module": { "type": "string", "description": "module slug" },
+          "order": { "type": "integer", "description": "Global topological index. A `use` link's target must have a strictly lower order." },
+          "beats": {
+            "type": "array",
+            "description": "Pillar/pedagogy: the ordered concepts this note covers. A writer may ONLY `define` concepts listed here with kind=define.",
+            "items": {
+              "type": "object",
+              "required": ["concept", "kind"],
+              "additionalProperties": false,
+              "properties": {
+                "concept": { "type": "string", "description": "concept id" },
+                "kind": { "enum": ["define", "use", "preview"] }
+              }
+            }
+          },
+          "linkVocab": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Closed vocabulary: the ONLY concept ids this note may [[link]] to (its beats + prereqs + glossary). Out-of-vocab links are build failures."
+          },
+          "prereqs": { "type": "array", "items": { "type": "string" }, "description": "concept ids the reader must already know" },
+          "alreadyTaught": { "type": "array", "items": { "type": "string" }, "description": "prereq concept ids the reader has SEEN in an earlier note: link, do not re-teach." },
+          "blockIds": { "type": "array", "items": { "type": "string" }, "description": "Declared block ids this note defines, e.g. ['^def-confluence']. Transclusion targets must resolve to one of these." }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "description": "Prereq DAG edges. from depends on to (to must be taught first).",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "confidence"],
+        "additionalProperties": false,
+        "properties": {
+          "from": { "type": "string", "description": "concept id that depends" },
+          "to": { "type": "string", "description": "concept id that is the prerequisite" },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1, "description": "Architect's calibrated confidence. The gate reviews lowest-confidence edges first." },
+          "why": { "type": "string", "description": "One-line justification, e.g. 'beta-reduction uses substitution in its definition'." }
+        }
+      }
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["slug", "title", "order"],
+        "additionalProperties": false,
+        "properties": {
+          "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "title": { "type": "string" },
+          "order": { "type": "integer" }
+        }
+      }
+    }
+  }
+}
