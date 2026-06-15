@@ -21,10 +21,14 @@ Load the `course-design` skill. Read the outline. Produce a **build manifest** t
 - plan **figures** per note (`figures: [{id, kind, caption}]`) wherever a combinatorial graph helps — graph rewrites, interaction nets, DAGs
 - pick `course.outDir` (default `./<Course Title>`)
 
-Write it to `.antirot/manifest.json`; confirm it satisfies the schema.
+Write it to `.antirot/manifest.json`. Then run the deterministic **plan check** and fix every error before continuing:
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-manifest.mjs .antirot/manifest.json
+```
+It catches structural plan bugs (cycles, dangling homeNote/beat/vocab/prereq refs, prereqs that aren't topo-legal, duplicate ids/orders, exercise/figure scope) before any generation happens. Do not proceed past errors.
 
-## 2 — Independent DAG critique (surface it)
-Spawn the `dag-critic` agent with the manifest. **Show the user a summary of its findings** — missing/spurious edges, cycles, mis-homed concepts. Do not silently fold them in.
+## 2 — Independent design critique (surface it)
+Spawn the `dag-critic` agent with the manifest. It judges what the validator can't — semantically wrong dependency edges, mis-homed concepts, decomposition, plus pedagogy (overloaded beats, weak exercise plan, grounding gaps). **Show the user a summary of its findings**; do not silently fold them in.
 
 ## 3 — Gate (mandatory; no "approve all" shortcut)
 Use AskUserQuestion to walk the user through:
