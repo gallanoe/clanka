@@ -78,7 +78,7 @@ LLMs are most dangerous exactly where they're most fluent — confident, wrong d
 
 Design, dag-critic, reviewer, and correctness-critical lessons run on Opus 4.8; ordinary lessons on Sonnet 4.6; structural generation and checks are plain Node scripts. Routing is by **correctness-criticality** (from the manifest), not raw difficulty.
 
-To override all writers to one model, just ask in the prompt — e.g. "use Opus 4.8 for all writers." The command passes a `writerModel` to the workflow; the reviewer stays on Opus regardless.
+To override the writer or researcher model, just ask in the prompt — e.g. "use Opus 4.8 for all writers" or "use Opus for research." The command passes `writerModel` / `researcherModel` to the workflows; the reviewer stays on Opus regardless.
 
 ## Optional tooling
 `check.mjs` runs its core checks with zero dependencies. If `mmdc` (mermaid-cli) or the `katex` package are present, it will additionally render-check the DAG and LaTeX (wiring is stubbed for the first release).

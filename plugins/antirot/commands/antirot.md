@@ -36,6 +36,8 @@ Iterate, re-writing `.antirot/manifest.json` on each change. **Do not proceed to
 ## 4 — Research (ground before writing)
 Build the small grounding list from the manifest: `grounding = concepts.filter(c => c.groundingRequired).map(c => ({id: c.id, title: c.title}))`. If non-empty, invoke the Workflow tool with `scriptPath: "${CLAUDE_PLUGIN_ROOT}/workflows/research.js"` and `args: { manifestPath: "<abs path to .antirot/manifest.json>", grounding }`. It returns `{ sources: { conceptId: [...] } }`.
 
+If the user asked for a specific research model — e.g. "use Opus for research" — add `researcherModel: "opus"` (or `sonnet`/`fable`/`haiku`) to the args. Omit to default to Sonnet.
+
 Persist those sources back into `.antirot/manifest.json` (set each concept's `sources`). This must happen **before** build-artifacts so Further reading + Resources are generated from real citations.
 
 ## 5 — Deterministic skeleton + briefs

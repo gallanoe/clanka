@@ -10,6 +10,9 @@ export const meta = {
 // inlined into the workflow call.
 const grounding = (args && args.grounding) || []
 const manifestPath = args && args.manifestPath
+// researcherModel (optional): force researchers to this model ('opus' | 'sonnet'
+// | 'fable' | 'haiku'). Omit to default to Sonnet.
+const researcherModel = (args && args.researcherModel) || 'sonnet'
 if (!manifestPath) {
   log('no manifestPath in args — aborting')
   return { error: 'missing-manifestPath' }
@@ -46,7 +49,7 @@ const results = await parallel(
         `Read ${manifestPath} for the course context (title, how this concept is used, neighbouring concepts). ` +
         `Capture the authoritative definition/theorem statement where the concept is correctness-critical. ` +
         `Return ONLY URLs you actually fetched — no recalled or guessed links.`,
-      { label: `research:${c.id}`, phase: 'Research', agentType: 'antirot:researcher', model: 'sonnet', schema: SOURCES },
+      { label: `research:${c.id}`, phase: 'Research', agentType: 'antirot:researcher', model: researcherModel, schema: SOURCES },
     ).then((r) => ({ id: c.id, sources: r?.sources ?? [] })),
   ),
 )
