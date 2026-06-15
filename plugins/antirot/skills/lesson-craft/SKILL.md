@@ -10,7 +10,7 @@ A lesson is not a definition dump in topological order. The reader should feel *
 ## The define-beat arc
 For every `define` beat, write in this order — it is the spine of a good explanation:
 
-1. **Motivate.** Open with *why this concept exists*. Your brief gives a one-line `motivation` (usually the limitation of a prior concept: "term rewriting duplicates work when a subterm is shared → we need a structure that lets two places point at one thing"). Expand it into a sentence or two that makes the reader *want* the concept before it arrives. This is not optional and not padding — it is the difference between a concept that lands and one that's just *there*.
+1. **Motivate.** Open with *why this concept exists*. Your brief gives a one-line `motivation` (usually the limitation of a prior concept: "the approach so far falls apart once the input gets large → we need something that doesn't"). Expand it into a sentence or two that makes the reader *want* the concept before it arrives. This is not optional and not padding — it is the difference between a concept that lands and one that's just *there*.
 2. **Build intuition.** Before any formalism: a concrete instance, a picture, or an analogy. Concrete before abstract; example before definition where it helps. Give the one-sentence mental model the reader can carry ("a graph is just dots joined by lines — the dots hold data, the lines say what's related"). State analogies' limits if they can mislead.
 3. **Formal definition.** Now fill the pre-stamped `> [!note] Definition ^def-<id>` callout. Precise, every symbol defined. The reader meets the formalism already knowing what it's *for* and what it *feels like*.
 4. **Worked example.** A minimal but non-trivial instance, every step shown, tied back to the definition. Pick the smallest example that still exercises the idea (not so trivial it's vacuous).
@@ -42,7 +42,7 @@ Fast-but-not-confusing = **terse density + standard/rich scaffolding**: economic
 ## Worked-example design
 - Smallest instance that still shows the idea working.
 - Show **every** step — the ones you'd "obviously" skip are where readers get lost (and where your math gets silently checked).
-- End by connecting the result back to the definition or motivation ("…which is exactly the normal form we wanted").
+- End by connecting the result back to the definition or motivation ("…which is exactly the result the definition promised").
 
 ## What good looks like vs the failure
 - **Good:** the reader meets each concept already wanting it, gets a concrete feel, then the precise definition, then sees it work — fast, no wasted words, no gaps.

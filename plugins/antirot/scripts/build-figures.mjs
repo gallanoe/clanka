@@ -2,8 +2,8 @@
 // antirot — combinatorial-graph figure renderer.
 //
 // KaTeX renders math, not graphs. Mermaid handles simple node-edge diagrams
-// (authored directly in lessons), but can't cleanly do ports / interaction nets
-// / precise rewrite figures. For those, a lesson-writer authors a structured
+// (authored directly in lessons), but can't cleanly do ports / typed connection
+// points / precise custom layouts. For those, a lesson-writer authors a structured
 // graph SPEC (never raw SVG — that's coordinate hallucination) at
 // `.antirot/figures/<id>.json`; this script compiles it to Graphviz dot and
 // renders a committed SVG into `<outDir>/assets/<id>.svg`, embedded in the note
@@ -16,7 +16,7 @@
 // the core pipeline has no npm deps).
 //
 // Spec shape (validated here and in check.mjs):
-//   { "id": "rewrite-1", "kind": "digraph"|"graph"|"interaction-net",
+//   { "id": "fig-1", "kind": "digraph"|"graph"|"port-graph",
 //     "rankdir": "TB"|"LR",
 //     "nodes": [ {"id":"a","label":"A","ports":["l","r"]} ],
 //     "edges": [ {"from":"a","to":"b","label":"f","fromPort":"r","toPort":"l"} ] }
@@ -106,13 +106,13 @@ export function validateSpec(spec) {
 }
 
 export function toDot(spec) {
-  const directed = spec.kind !== "graph"; // interaction-net + digraph render directed
+  const directed = spec.kind !== "graph"; // port-graph + digraph render directed
   const kw = directed ? "digraph" : "graph";
   const sep = directed ? "->" : "--";
   const q = (s) => `"${String(s).replace(/"/g, '\\"')}"`;
   const lines = [`${kw} G {`];
   if (spec.rankdir) lines.push(`  rankdir=${spec.rankdir};`);
-  lines.push(`  node [shape=${spec.kind === "interaction-net" ? "record" : "circle"}];`);
+  lines.push(`  node [shape=${spec.kind === "port-graph" ? "record" : "circle"}];`);
   for (const n of spec.nodes) {
     if (n.ports && n.ports.length) {
       const rec = n.ports.map((p) => `<${p}> ${p}`).join("|");

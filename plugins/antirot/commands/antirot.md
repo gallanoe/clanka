@@ -18,7 +18,7 @@ Load the `course-design` skill. Read the outline. Produce a **build manifest** t
 - tag concept `criticality` + `difficulty`
 - set `groundingRequired: true` on concepts the model may not reliably know (niche/cutting-edge/low-confidence/critical)
 - plan **exercises** per note (`kind`, prefer apply/derive/prove) and an optional per-module `capstone`
-- plan **figures** per note (`figures: [{id, kind, caption}]`) wherever a combinatorial graph helps — graph rewrites, interaction nets, DAGs
+- plan **figures** per note (`figures: [{id, kind, caption}]`) wherever a combinatorial graph helps — dependency graphs, state machines, trees, networks
 - pick `course.outDir` (default `./<Course Title>`) and both pacing axes — `density` (word economy) and `scaffolding` (motivation/intuition depth); "fast but not confusing" = terse/balanced density + standard/rich scaffolding (never `gentle` density as a substitute for scaffolding)
 
 Write it to `.antirot/manifest.json`. Then run the deterministic **plan check** and fix every error before continuing:

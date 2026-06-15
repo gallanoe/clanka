@@ -9,7 +9,7 @@ These syntaxes are underrepresented in training data and fail in predictable way
 
 ## Wikilinks
 - `[[concept-id]]` links to a concept's canonical home note (resolved via the alias the skeleton declares). `[[concept-id|display text]]` for custom text.
-- Link **only** concept ids in this note's closed `linkVocab`. Never invent a target, never guess a slug variant (`gradient_descent` vs `gradient-descent`) — the checker rejects non-canonical slugs and does not auto-fix them.
+- Link **only** concept ids in this note's closed `linkVocab`. Never invent a target, never guess a slug variant (`my_concept` vs `my-concept`) — the checker rejects non-canonical slugs and does not auto-fix them.
 - Never link a concept taught later (higher `order`) outside a preview callout — that's an illegal forward reference.
 
 ## Callouts (closed enum — others are rejected)
@@ -22,7 +22,7 @@ These syntaxes are underrepresented in training data and fail in predictable way
 - `> [!warning]` — a common mistake
 - `> [!summary]` — the end-of-lesson recap
 
-Every continuation line of a callout must begin with `>`. To declare a transcludable block, append `^block-id` to the callout's first line: `> [!note] Definition ^def-confluence`.
+Every continuation line of a callout must begin with `>`. To declare a transcludable block, append `^block-id` to the callout's first line: `> [!note] Definition ^def-myconcept`.
 
 **Foldable callouts** (attempt-then-reveal): append `-` to collapse by default, `+` to expand. Exercises and their solutions are foldable so the learner attempts before revealing:
 
@@ -41,9 +41,9 @@ Pick the tool by what you're showing. Each tool does one thing well; using the w
 |---|---|---|
 | **Math** — equations, formulas, matrices, derivations, symbols | **KaTeX** (`$…$` / `$$…$$`) | Math typesetting only. **KaTeX cannot draw graphs or diagrams** — never attempt one in `$…$`. |
 | **Process / flow** — flowchart, state machine, sequence, ER, class diagram, simple tree/DAG, git graph | **Mermaid** (inline) | Native, text, no toolchain; good auto-layout for these standard named diagram types. |
-| **Combinatorial graph** — nodes & edges, interaction nets (ports), automata, dependency graphs, multi-edges, precise/custom layout | **Figure spec → SVG** (Graphviz) | Ports, clusters, multi-edges, and precise layout that mermaid can't do. |
+| **Combinatorial graph** — nodes & edges, graphs with ports/typed connection points, state machines, dependency graphs, multi-edges, precise/custom layout | **Figure spec → SVG** (Graphviz) | Ports, clusters, multi-edges, and precise layout that mermaid can't do. |
 | **Structured layout** — memory/byte layout, register fields, block architectures (e.g. a Transformer as boxes-and-arrows), pipelines | **Figure spec → SVG** (record/struct nodes) — or a plain **Markdown table** for a pure grid | dot `record` nodes model cells/blocks well. |
-| **Dynamic / step-through** — a reduction or rewrite sequence, a fixpoint converging, dataflow over ticks | **Static multi-panel SVG** (frames: step 1 / step 2 / …) | A few SVG frames express almost any "animation" portably; no special tooling. |
+| **Dynamic / step-through** — a process unfolding step by step, a value converging over iterations, a structure changing over time | **Static multi-panel SVG** (frames: step 1 / step 2 / …) | A few SVG frames express almost any "animation" portably; no special tooling. |
 | **Pictorial / illustrative** — a scene, a UI mockup, a photo ("a man walking a dog") | **Not generated** — describe in prose, or embed a real external image you have (`![[name.png]]`) | No tool here draws illustrations, and you must never hand-write SVG (coordinate hallucination). |
 
 Rule of thumb, mermaid vs figure-spec→SVG: **mermaid** for the standard named diagram types when its auto-layout is fine; **figure spec → SVG** when you need ports, precise/custom layout, record/struct nodes, or graph-theoretic structure mermaid mangles. Everything renders everywhere (Obsidian, GitHub, web, export) and is checkable. Only **figure-spec→SVG** figures are planned in the manifest (`note.figures`) and rendered by the build; mermaid and KaTeX are authored inline as needed.
@@ -57,10 +57,10 @@ Rule of thumb, mermaid vs figure-spec→SVG: **mermaid** for the standard named 
 - The prereq DAG is generated for you; you don't hand-write it.
 
 ## Combinatorial graphs & figures (never draw graphs in KaTeX/LaTeX)
-**KaTeX renders math, not graphs — never try to draw a graph in `$...$` / `$$...$$`.** For figures that mermaid can't do well (ports, interaction nets, multi-edges, precise rewrite rules), the note has a planned figure (see your brief's `figures`). For each planned figure:
+**KaTeX renders math, not graphs — never try to draw a graph in `$...$` / `$$...$$`.** For figures that mermaid can't do well (ports, multi-edges, precise/custom layout), the note has a planned figure (see your brief's `figures`). For each planned figure:
 1. Author a **graph spec** — never raw SVG — at `.antirot/figures/<id>.json`:
    ```json
-   {"id":"<id>","kind":"digraph"|"graph"|"interaction-net","rankdir":"LR",
+   {"id":"<id>","kind":"digraph"|"graph"|"port-graph","rankdir":"LR",
     "nodes":[{"id":"a","label":"A","ports":["l","r"]}],
     "edges":[{"from":"a","to":"b","label":"f","fromPort":"r","toPort":"l"}]}
    ```
