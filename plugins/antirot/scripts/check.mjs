@@ -191,9 +191,30 @@ for (const n of [...m.notes].sort((a, b) => a.order - b.order)) {
     if (solutions.length < foldableQuestions.length)
       err("solution-missing", n.slug, `${foldableQuestions.length} foldable exercise(s) but only ${solutions.length} foldable solution callout(s) — every exercise needs a solution`);
   }
-  for (const c of callouts)
-    if (/to be written/i.test(c.bodyText))
-      err("unfilled-stub", n.slug, `a [!${c.type}] callout still contains a "to be written" placeholder`);
+  if (/to be written/i.test(body))
+    err("unfilled-stub", n.slug, `still contains a "to be written" placeholder (unfilled definition, motivation, exercise, or figure)`);
+
+  // motivation/intuition before formalism: a define section must not jump
+  // straight to its Definition callout — there must be prose (motivation/
+  // intuition) between the heading and the `> [!note] Definition ^def` line.
+  const defineTitles = new Set(
+    (n.beats ?? [])
+      .filter((b) => b.kind === "define")
+      .map((b) => conceptById.get(b.concept)?.title?.toLowerCase())
+      .filter(Boolean),
+  );
+  if (defineTitles.size) {
+    let section = null, sawProse = false;
+    for (const line of lines) {
+      const h = line.match(/^##\s+(.+?)\s*$/);
+      if (h) { section = defineTitles.has(h[1].toLowerCase()) ? h[1] : null; sawProse = false; continue; }
+      if (!section) continue;
+      if (/^>\s*\[!note\]\s+Definition\b/i.test(line)) {
+        if (!sawProse) err("no-motivation", n.slug, `define section "${section}" opens with the definition — no motivation/intuition before it`);
+        section = null;
+      } else if (line.trim()) sawProse = true;
+    }
+  }
 
   // planned figures: spec exists + valid, SVG rendered, embed present
   for (const fig of n.figures ?? []) {

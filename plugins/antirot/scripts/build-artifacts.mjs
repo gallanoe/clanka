@@ -291,10 +291,14 @@ function skeletonNote(n) {
       const c = conceptById.get(b.concept);
       const label = c ? c.title : b.concept;
       if (b.kind === "define") {
-        // The canonical definition lives HERE (the home lesson). ^def-<id> is
-        // the single source — transcluded by the Glossary and linkable as
-        // [[<concept>#^def-<id>]]. No separate glossary definition exists.
-        return `## ${label}\n\n> [!note] Definition ^def-${b.concept}\n> _(to be written)_\n`;
+        // Arc: motivate -> intuition -> definition. Seed the motivation (from the
+        // manifest) BEFORE the definition callout so the section never opens with
+        // formalism. The canonical definition lives HERE; ^def-<id> is the single
+        // source (transcluded by the Glossary, linkable as [[<concept>#^def-<id>]]).
+        const motiv = c?.motivation
+          ? `${c.motivation}\n`
+          : `_(motivate: why this concept exists — to be written)_\n`;
+        return `## ${label}\n\n${motiv}\n> [!note] Definition ^def-${b.concept}\n> _(to be written)_\n`;
       }
       if (b.kind === "preview") {
         return `## ${label}\n\n> [!tip] Coming up\n> _(to be written — forward pointer only; do not teach here)_\n`;

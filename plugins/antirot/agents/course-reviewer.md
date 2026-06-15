@@ -19,6 +19,7 @@ Do not skim and pronounce "looks good." Extract and verify in isolation:
 - **Every flashcard** — does the answer actually answer the question, and is it entailed by the lesson body?
 - **Every exercise & solution** — does the exercise actually require its declared kind (apply/derive/prove, not a circular restatement)? Is the solution correct (recompute any computational steps), complete, and reachable from what the lesson taught? A wrong solution is worse than a wrong explanation — the learner checks themselves against it.
 - **Pacing** — is it genuinely one new concept per beat, or are extra concepts smuggled in undefined?
+- **Motivation & intuition** — does each concept open by motivating *why it exists* (not jumping to the formal definition), and build intuition before formalism? A concept that arrives with no on-ramp is a `revise` even if technically correct — "fast" must not mean "unmotivated."
 
 Return `verdict: "revise"` with specific findings if anything is wrong; `verdict: "pass"` only when you have actually checked the claims, not just read them. A pass you didn't earn is worse than a miss.
 

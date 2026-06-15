@@ -55,6 +55,7 @@ LLMs are most dangerous exactly where they're most fluent — confident, wrong d
 - **understanding-checks are planned in the manifest** (per-beat quick checks, per-lesson exercises by cognitive kind, per-module capstones) with foldable attempt-then-reveal solutions; the checker enforces coverage + solution-present and the reviewer verifies the solutions are correct
 - **per-lesson Further reading** is stamped into each note from that note's verified sources (deterministic — the model never emits citation URLs)
 - **definitions are lesson-canonical**: a concept is defined once, in the lesson that introduces it (a pre-stamped `^def-<id>` block); references link/jump there (`[[concept#^def-id]]`), and the Glossary is an auto-generated index that *transcludes* those lesson definitions — no duplicated or fragmented definitions
+- **motivation is first-class**: every concept carries a `motivation` (why it exists / the prior-concept limitation it resolves); define sections open with it and build intuition *before* the formal definition. Pacing is two axes — `density` (word economy) and `scaffolding` (on-ramp depth) — so "fast" never means "unmotivated" (the checker flags a definition with no motivation before it; the reviewer judges depth)
 - **combinatorial graphs are spec-driven** — writers author a graph spec (never raw SVG), rendered to committed SVG by Graphviz; KaTeX is math-only, so graphs never go through it
 
 ## Components
@@ -64,6 +65,7 @@ LLMs are most dangerous exactly where they're most fluent — confident, wrong d
 | command | `/antirot` | Orchestrates design → gate → generate → check |
 | skill | `course-design` | Pedagogy, DAG, manifest authoring, amendment protocol |
 | skill | `obsidian-authoring` | The exact Obsidian syntax the checker enforces |
+| skill | `lesson-craft` | Writing craft: motivate, build intuition, pace without confusing, design examples |
 | skill | `course-review` | Claim-level, chunked, canary-calibrated review method |
 | agent | `lesson-writer` | Writes one lesson vs the frozen manifest (parallel); grounds via web when unsure |
 | agent | `dag-critic` | Independent critique of the DAG before the gate |

@@ -18,6 +18,7 @@ Do not skim a lesson and pronounce it good — that is exactly how LLM judges mi
 - **Flashcards** — does the answer answer the question, and is it entailed by the body?
 - **Exercises & solutions** — does each exercise require its declared kind (not a circular restatement)? Recompute computational solutions; confirm conceptual ones are correct, complete, and reachable from the lesson. A wrong solution is worse than a wrong explanation, because the learner self-checks against it.
 - **Pacing** — genuinely one new concept per beat, or are extra concepts smuggled in undefined?
+- **Motivation & intuition** — does each define section open by motivating the concept (why it exists / what prior limitation it resolves) and build intuition before the formal definition? Jumping straight to formalism, or "fast" achieved by cutting the on-ramp, is a `revise` even when the content is correct.
 
 Return `revise` with specific findings on any failure; return `pass` only when you have actually checked the claims.
 

@@ -63,6 +63,7 @@ const orderOfConcept = (id) => {
 for (const c of concepts) {
   if (!c.homeNote) err("concept-no-home", c.id ?? "(?)", "concept has no homeNote");
   else if (!noteBySlug.has(c.homeNote)) err("dangling-home", c.id, `homeNote "${c.homeNote}" is not a note slug`);
+  if (!c.motivation) warn("no-motivation", c.id, "concept has no motivation — the writer has nothing to open the define section with; consider whether it earns its place");
 }
 
 // --- edges: refs, confidence, cycles ---------------------------------------

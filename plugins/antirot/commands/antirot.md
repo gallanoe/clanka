@@ -11,7 +11,7 @@ Plugin root: `${CLAUDE_PLUGIN_ROOT}`. Runtime state lives in `.antirot/` (gitign
 
 ## 1 — Design (inline, this session)
 Load the `course-design` skill. Read the outline. Produce a **build manifest** that validates against `${CLAUDE_PLUGIN_ROOT}/skills/course-design/manifest.schema.json`:
-- extract concepts; build the prereq DAG; every edge gets a calibrated `confidence` (0–1) + one-line `why`
+- extract concepts; write a one-line `motivation` per concept (why it exists / the prior-concept limitation it resolves); build the prereq DAG; every edge gets a calibrated `confidence` (0–1) + one-line `why`
 - assign each concept a canonical `homeNote`; lay out notes, modules, paths, slugs
 - write each note's **beats** (one new concept per beat) and its closed **`linkVocab`**
 - author the **notation table**, **voice** spec + exemplar, and each note's **alreadyTaught** ledger
@@ -19,7 +19,7 @@ Load the `course-design` skill. Read the outline. Produce a **build manifest** t
 - set `groundingRequired: true` on concepts the model may not reliably know (niche/cutting-edge/low-confidence/critical)
 - plan **exercises** per note (`kind`, prefer apply/derive/prove) and an optional per-module `capstone`
 - plan **figures** per note (`figures: [{id, kind, caption}]`) wherever a combinatorial graph helps — graph rewrites, interaction nets, DAGs
-- pick `course.outDir` (default `./<Course Title>`)
+- pick `course.outDir` (default `./<Course Title>`) and both pacing axes — `density` (word economy) and `scaffolding` (motivation/intuition depth); "fast but not confusing" = terse/balanced density + standard/rich scaffolding (never `gentle` density as a substitute for scaffolding)
 
 Write it to `.antirot/manifest.json`. Then run the deterministic **plan check** and fix every error before continuing:
 ```

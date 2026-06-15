@@ -18,8 +18,10 @@
         "pacing": {
           "type": "object",
           "additionalProperties": false,
+          "description": "Two orthogonal axes. 'Fast but not confusing' = terse/balanced density + standard/rich scaffolding.",
           "properties": {
-            "density": { "enum": ["terse", "balanced", "gentle"] },
+            "density": { "enum": ["terse", "balanced", "gentle"], "description": "Word economy (words per idea). terse = minimal words/high info-rate; gentle = more verbose (elaboration, restatement). Independent of scaffolding." },
+            "scaffolding": { "enum": ["lean", "standard", "rich"], "description": "On-ramp depth per concept. lean = minimal motivation, straight to formal; standard = motivate + one concrete intuition before the definition; rich = thorough motivation (incl. prior-concept limitation) + multiple intuitions/analogies. Independent of density." },
             "assumedBackground": { "type": "string" },
             "timeBudgetMin": { "type": "number", "description": "Target minutes per lesson" }
           }
@@ -61,6 +63,7 @@
           "id": { "type": "string", "pattern": "^[a-z0-9-]+$", "description": "Stable concept id; also the wikilink slug for its home note." },
           "title": { "type": "string" },
           "homeNote": { "type": "string", "description": "slug of the note where this concept is canonically defined (the unique `define` site)." },
+          "motivation": { "type": "string", "description": "Why this concept exists — the problem it solves or the limitation of a prior concept that demands it. One line; the writer opens the define section with it (motivation before formalism). The narrative reason the DAG edge can't capture." },
           "difficulty": { "enum": ["intro", "applied", "theory", "proof"] },
           "criticality": { "enum": ["normal", "critical"], "description": "critical => routed to the stronger model and to claim-level review. Downstream lessons depend on its correctness." },
           "glossary": { "type": "boolean", "description": "Appears in the auto-generated Glossary index, which transcludes this concept's canonical definition (^def-<id>) from its home lesson. No separate definition is authored." },
