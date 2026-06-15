@@ -34,6 +34,19 @@ Every continuation line of a callout must begin with `>`. To declare a transclud
 > <full worked solution; every computational step shown>
 ```
 
+## Figures — which tool for which job
+Pick the tool by what you're showing. Each tool does one thing well; using the wrong one produces broken or ugly output.
+
+| You want to show… | Use | Notes |
+|---|---|---|
+| **Math** — equations, formulas, matrices, derivations, symbols | **KaTeX** (`$…$` / `$$…$$`) | Math typesetting only. **KaTeX cannot draw graphs or diagrams** — never attempt one in `$…$`. |
+| **Process / flow** — flowchart, state machine, sequence, ER, class diagram, simple tree/DAG, git graph | **Mermaid** (inline) | Native, text, no toolchain; good auto-layout for these standard named diagram types. |
+| **Combinatorial graph** — nodes & edges, interaction nets (ports), automata, dependency graphs, multi-edges, precise/custom layout | **Figure spec → SVG** (Graphviz) | Ports, clusters, multi-edges, and precise layout that mermaid can't do. |
+| **Structured layout** — memory/byte layout, register fields, block architectures (e.g. a Transformer as boxes-and-arrows), pipelines | **Figure spec → SVG** (record/struct nodes) — or a plain **Markdown table** for a pure grid | dot `record` nodes model cells/blocks well. |
+| **Pictorial / illustrative** — a scene, a UI mockup, a photo ("a man walking a dog") | **Not generated** — describe in prose, or embed a real external image you have (`![[name.png]]`) | No tool here draws illustrations, and you must never hand-write SVG (coordinate hallucination). |
+
+Rule of thumb, mermaid vs figure-spec→SVG: **mermaid** for the standard named diagram types when its auto-layout is fine; **figure spec → SVG** when you need ports, precise/custom layout, record/struct nodes, or graph-theoretic structure mermaid mangles. Only **figure-spec→SVG** figures are planned in the manifest (`note.figures`) and rendered by the build; mermaid and KaTeX are authored inline as needed.
+
 ## LaTeX
 - Inline `$...$`, block `$$...$$`. Use the **notation table's exact symbol** for every recurring object — no substitutes.
 - Define every symbol you introduce. Balance every delimiter. Avoid bare `$` in prose (write "USD 5" or escape it) so it isn't read as math.
