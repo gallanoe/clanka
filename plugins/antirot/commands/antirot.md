@@ -49,9 +49,11 @@ Generates: course map (with DAG mermaid), module overviews (+ capstones), glossa
 - **>5 lessons:** invoke the Workflow tool with `scriptPath: "${CLAUDE_PLUGIN_ROOT}/workflows/build-course.js"` and **small args**:
   ```
   { manifestPath, outDir, briefsDir: ".antirot/briefs",
-    notes: [ {slug, title, path, critical} ... ] }
+    notes: [ {slug, title, path, critical} ... ],
+    writerModel?: "opus" | "sonnet" | "fable" | "haiku" }
   ```
   where `critical` is true if any of the note's beat concepts has `criticality: "critical"` or `difficulty: "proof"`. Do NOT put the manifest, concepts, beats, or sources in args — writers read their brief from disk.
+  **`writerModel`** (optional): if the user asked for a specific writer model — e.g. "use Opus 4.8 for all writers" / "write everything with Opus" — pass it here (`"opus"`) to force every lesson-writer to that model. Omit to keep the default cost-routing (Opus for critical notes, Sonnet otherwise). The reviewer stays on Opus regardless.
 
 ## 7 — Figures (render graph specs to SVG)
 ```

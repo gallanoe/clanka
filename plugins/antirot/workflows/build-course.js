@@ -12,8 +12,12 @@ export const meta = {
 // Small args only — the manifest is NOT inlined (that caused the orchestrator to
 // trim it and silently corrupt grounding/routing). Each writer reads its own
 // small brief from disk; the workflow just iterates slugs and routes by `critical`.
-//   args = { manifestPath, outDir, briefsDir, notes: [{slug, title, path, critical}] }
-const { manifestPath, outDir, briefsDir, notes } = args || {}
+//   args = { manifestPath, outDir, briefsDir, notes: [{slug, title, path, critical}],
+//            writerModel? }
+// writerModel (optional): force every lesson-writer to this model ('opus' |
+// 'sonnet' | 'fable' | 'haiku'). Omit to keep cost-routing (Opus for critical
+// notes, Sonnet otherwise).
+const { manifestPath, outDir, briefsDir, notes, writerModel } = args || {}
 if (!Array.isArray(notes) || !outDir || !briefsDir) {
   log('missing args (need notes, outDir, briefsDir) — aborting')
   return { error: 'bad-args' }
@@ -100,7 +104,7 @@ const results = await pipeline(
         label: `write:${n.slug}`,
         phase: 'Write',
         agentType: 'antirot:lesson-writer',
-        model: n.critical ? 'opus' : 'sonnet',
+        model: writerModel || (n.critical ? 'opus' : 'sonnet'),
         schema: WRITE_RESULT,
       },
     ),
