@@ -129,6 +129,20 @@
                 "interleave": { "type": "array", "items": { "type": "string" }, "description": "optional already-taught concept ids this exercise also draws on (spaced retrieval). Must be lower-order concepts." }
               }
             }
+          },
+          "figures": {
+            "type": "array",
+            "description": "Planned combinatorial-graph figures for this lesson, rendered to SVG by build-figures.mjs from a writer-authored spec. Each slot is checkable: spec present + valid + SVG rendered + embedded. KaTeX/LaTeX cannot draw graphs — use this (or mermaid for simple ones).",
+            "items": {
+              "type": "object",
+              "required": ["id", "kind"],
+              "additionalProperties": false,
+              "properties": {
+                "id": { "type": "string", "pattern": "^[a-z0-9-]+$", "description": "globally-unique figure id; spec at .antirot/figures/<id>.json, renders to assets/<id>.svg" },
+                "kind": { "enum": ["graph", "digraph", "interaction-net"] },
+                "caption": { "type": "string" }
+              }
+            }
           }
         }
       }

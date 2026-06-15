@@ -26,14 +26,20 @@ outline
   │
   ▼  design (inline, Opus) ── dag-critic ──► GATE (you approve, low-confidence edges first)
   │
-  ▼  build-artifacts.mjs ──► deterministic skeleton (MOCs, frontmatter, DAG mermaid, glossary)
+  ▼  research.js ──► fetch real sources for grounding-required concepts ──► persist to manifest
   │
-  ▼  build-course.js workflow ──► lesson-writers (parallel, model routed by criticality)
+  ▼  build-artifacts.mjs ──► skeleton (MOCs, frontmatter, DAG mermaid, glossary)
+  │                          + per-note briefs + per-lesson Further reading + Resources
+  ▼  build-course.js workflow ──► lesson-writers (parallel, read briefs, routed by criticality)
   │                               + course-reviewer (claim-level, per lesson) + seam pass
-  ▼  check.mjs ──► links / slugs / forward-refs / beats / callouts / transclusions / completion
+  ▼  build-figures.mjs ──► render graph specs → committed SVG
+  │
+  ▼  check.mjs ──► links / slugs / forward-refs / beats / exercises / callouts / citations / figures
   │
   ▼  resolve amendments & revisions ──► report (with residual risk surfaced)
 ```
+
+> **Scale note:** the workflow never receives the manifest as `args` (it can be hundreds of KB and gets silently trimmed). It gets a small slug list + paths; each lesson-writer reads its own per-note **brief** from `.antirot/briefs/<slug>.json`.
 
 ### The manifest (`.antirot/manifest.json`)
 The coordination spine. Schema: `skills/course-design/manifest.schema.json`. It freezes names, order, and structure — **not** correctness. Its freeze is an *optimistic lock*: a lesson-writer that finds the plan wrong emits an **amendment** instead of inventing a link, so reality can flow back into the plan.
@@ -47,6 +53,8 @@ LLMs are most dangerous exactly where they're most fluent — confident, wrong d
 - a **notation/voice/already-taught contract** keeps parallel writers from drifting
 - a **research pass** fetches real sources for concepts the model may not reliably know, so writers ground definitions in fact instead of fluent recall, the reviewer verifies against them, and the Resources appendix is built from real (not hallucinated) citations
 - **understanding-checks are planned in the manifest** (per-beat quick checks, per-lesson exercises by cognitive kind, per-module capstones) with foldable attempt-then-reveal solutions; the checker enforces coverage + solution-present and the reviewer verifies the solutions are correct
+- **per-lesson Further reading** is stamped into each note from that note's verified sources (deterministic — the model never emits citation URLs)
+- **combinatorial graphs are spec-driven** — writers author a graph spec (never raw SVG), rendered to committed SVG by Graphviz; KaTeX is math-only, so graphs never go through it
 
 ## Components
 
@@ -60,9 +68,11 @@ LLMs are most dangerous exactly where they're most fluent — confident, wrong d
 | agent | `dag-critic` | Independent critique of the DAG before the gate |
 | agent | `researcher` | Fetches real sources for grounding-required concepts |
 | agent | `course-reviewer` | Cold adversarial reviewer (per-lesson + seams); verifies against sources |
-| workflow | `build-course.js` | Research → fan out writers → review |
-| script | `build-artifacts.mjs` | Deterministic skeleton generation |
-| script | `check.mjs` | Deterministic structural + completion checks |
+| workflow | `research.js` | Pre-step: fetch real sources for grounding-required concepts |
+| workflow | `build-course.js` | Fan out writers (read per-note briefs) + review |
+| script | `build-artifacts.mjs` | Deterministic skeleton + per-note briefs + per-lesson Further reading + Resources |
+| script | `build-figures.mjs` | Render graph specs → committed SVG (Graphviz) |
+| script | `check.mjs` | Deterministic structural / completion / citation / figure checks |
 
 ## Models
 

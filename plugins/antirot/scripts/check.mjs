@@ -33,9 +33,11 @@ if (!manifestPath) {
   process.exit(2);
 }
 const reportPath = valueOf("--report") ?? join(".antirot", "check-report.json");
+const figuresDir = valueOf("--figures") ?? join(".antirot", "figures");
 
 const m = JSON.parse(readFileSync(manifestPath, "utf8"));
 const outDir = resolve(m.course.outDir);
+const assetsDir = join(outDir, "assets");
 
 const CALLOUT_ENUM = new Set([
   "note", "info", "example", "question", "tip", "warning", "summary", "preview", "success",
@@ -196,6 +198,24 @@ for (const n of [...m.notes].sort((a, b) => a.order - b.order)) {
     if (/to be written/i.test(c.bodyText))
       err("unfilled-stub", n.slug, `a [!${c.type}] callout still contains a "to be written" placeholder`);
 
+  // planned figures: spec exists + valid, SVG rendered, embed present
+  for (const fig of n.figures ?? []) {
+    const specPath = join(figuresDir, `${fig.id}.json`);
+    if (!existsSync(specPath)) {
+      err("figure-spec-missing", n.slug, `planned figure "${fig.id}" has no spec at ${specPath}`);
+      continue;
+    }
+    let spec;
+    try { spec = JSON.parse(readFileSync(specPath, "utf8")); }
+    catch (e) { err("figure-spec-invalid", n.slug, `figure "${fig.id}": bad JSON (${e.message})`); continue; }
+    const problem = validateFigureSpec(spec);
+    if (problem) err("figure-spec-invalid", n.slug, `figure "${fig.id}": ${problem}`);
+    if (!existsSync(join(assetsDir, `${fig.id}.svg`)))
+      err("figure-not-rendered", n.slug, `figure "${fig.id}" not rendered — run build-figures.mjs (needs @hpcc-js/wasm or system dot)`);
+    if (!body.includes(`${fig.id}.svg`))
+      err("figure-not-embedded", n.slug, `figure "${fig.id}" rendered but not embedded (expected ![[assets/${fig.id}.svg]])`);
+  }
+
   // links
   let mt;
   linkRe.lastIndex = 0;
@@ -204,6 +224,13 @@ for (const n of [...m.notes].sort((a, b) => a.order - b.order)) {
     const target = mt[2].trim();
     const block = mt[3] ? mt[3].replace(/^#/, "") : null;
     const lineIdx = body.slice(0, mt.index).split("\n").length - 1;
+
+    // asset/figure embeds reference a file path under the course dir, not a slug
+    if (isEmbed && /\.(svg|png|jpe?g|gif|webp)$/i.test(target)) {
+      if (!existsSync(join(outDir, target)))
+        err("asset-missing", n.slug, `embedded asset ![[${target}]] not found under the course dir`);
+      continue;
+    }
 
     const resolved = alias.get(target);
     if (!resolved) {
@@ -298,6 +325,25 @@ function computeCalloutSpans(lines) {
     cur = undefined;
   }
   return out;
+}
+
+function validateFigureSpec(spec) {
+  // kept in sync with build-figures.mjs validateSpec
+  if (!spec || typeof spec !== "object") return "not an object";
+  if (!spec.id || !/^[a-z0-9-]+$/.test(spec.id)) return "missing/invalid id";
+  if (!Array.isArray(spec.nodes) || !spec.nodes.length) return "no nodes";
+  if (!Array.isArray(spec.edges)) return "edges must be an array";
+  const ids = new Set();
+  for (const nd of spec.nodes) {
+    if (!nd.id) return "a node is missing id";
+    if (ids.has(nd.id)) return `duplicate node id "${nd.id}"`;
+    ids.add(nd.id);
+  }
+  for (const e of spec.edges) {
+    if (!ids.has(e.from)) return `edge from unknown node "${e.from}"`;
+    if (!ids.has(e.to)) return `edge to unknown node "${e.to}"`;
+  }
+  return null;
 }
 
 function scanCallouts(lines) {

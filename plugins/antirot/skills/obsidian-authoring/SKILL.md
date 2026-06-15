@@ -38,8 +38,21 @@ Every continuation line of a callout must begin with `>`. To declare a transclud
 - Inline `$...$`, block `$$...$$`. Use the **notation table's exact symbol** for every recurring object — no substitutes.
 - Define every symbol you introduce. Balance every delimiter. Avoid bare `$` in prose (write "USD 5" or escape it) so it isn't read as math.
 
-## Mermaid
-- You generally do not hand-write mermaid — the DAG is generated. If you must, quote every node label (`id["Label (with parens)"]`) so parentheses, slashes, and math don't break the parser, and avoid reserved words as node ids.
+## Mermaid (simple graphs only)
+- For a simple node-edge diagram, write mermaid directly — Obsidian renders it natively. Quote every node label (`id["Label (with parens)"]`) so parens/slashes/math don't break the parser; avoid reserved words as node ids.
+- The prereq DAG is generated for you; you don't hand-write it.
+
+## Combinatorial graphs & figures (never draw graphs in KaTeX/LaTeX)
+**KaTeX renders math, not graphs — never try to draw a graph in `$...$` / `$$...$$`.** For figures that mermaid can't do well (ports, interaction nets, multi-edges, precise rewrite rules), the note has a planned figure (see your brief's `figures`). For each planned figure:
+1. Author a **graph spec** — never raw SVG — at `.antirot/figures/<id>.json`:
+   ```json
+   {"id":"<id>","kind":"digraph"|"graph"|"interaction-net","rankdir":"LR",
+    "nodes":[{"id":"a","label":"A","ports":["l","r"]}],
+    "edges":[{"from":"a","to":"b","label":"f","fromPort":"r","toPort":"l"}]}
+   ```
+   Edges may only reference declared node ids (the checker rejects dangling edges).
+2. **Embed it inline** where it belongs in the lesson: `![[assets/<id>.svg]]` with a one-line caption beneath.
+A build step renders the spec to `assets/<id>.svg`; you never write SVG by hand.
 
 ## Transclusion
 - `![[concept-glossary#^def-concept]]` embeds a glossary definition. Only target a block id that was actually declared (glossary stubs declare `^def-<id>`). A transclusion to an undeclared block fails the check.

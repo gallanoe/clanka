@@ -1,0 +1,8 @@
+{
+  "name": "antirot-scripts",
+  "private": true,
+  "description": "Optional toolchain for antirot. The core pipeline (build-artifacts, check) needs no dependencies. Figure rendering needs a Graphviz renderer: install @hpcc-js/wasm here (npm install), or put system `dot` on PATH.",
+  "optionalDependencies": {
+    "@hpcc-js/wasm": "^2.16.0"
+  }
+}

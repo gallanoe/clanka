@@ -27,6 +27,7 @@ if (!manifestPath) {
 }
 const statePath =
   valueOf("--state") ?? join(".antirot", "build-state.json");
+const briefsDir = valueOf("--briefs") ?? join(".antirot", "briefs");
 
 const m = JSON.parse(readFileSync(manifestPath, "utf8"));
 const outDir = resolve(m.course.outDir);
@@ -76,10 +77,47 @@ for (const n of [...m.notes].sort((a, b) => a.order - b.order)) {
   writeFile(full, skeletonNote(n), false);
 }
 
+// --- per-note writer briefs (small; lesson-writers read these, not the 224KB
+//     manifest — keeps the workflow args tiny and writer context lean) ---------
+mkdirSync(briefsDir, { recursive: true });
+for (const n of m.notes) {
+  writeFileSync(join(briefsDir, `${n.slug}.json`), JSON.stringify(noteBrief(n), null, 2));
+}
+
 writeFileSync(statePath, JSON.stringify(state, null, 2));
 console.log(
-  `build-artifacts: ${written} written, ${skipped} complete-and-skipped. outDir=${outDir}`,
+  `build-artifacts: ${written} written, ${skipped} complete-and-skipped, ${m.notes.length} briefs. outDir=${outDir}`,
 );
+
+// A self-contained brief: everything a lesson-writer needs to write one note,
+// without reading (and re-parsing) the whole manifest.
+function noteBrief(n) {
+  const titleOf = (id) => conceptById.get(id)?.title ?? id;
+  return {
+    slug: n.slug,
+    title: n.title,
+    path: n.path,
+    course: { title: m.course.title, slug: m.course.slug },
+    pacing: m.course.pacing ?? {},
+    voice: m.voice ?? null,
+    notation: m.notation ?? [],
+    beats: (n.beats ?? []).map((b) => ({ concept: b.concept, title: titleOf(b.concept), kind: b.kind })),
+    linkVocab: (n.linkVocab ?? []).map((id) => ({ id, title: titleOf(id) })),
+    prereqs: (n.prereqs ?? []).map((id) => ({
+      id,
+      title: titleOf(id),
+      alreadyTaught: (n.alreadyTaught ?? []).includes(id),
+    })),
+    blockIds: n.blockIds ?? [],
+    exercises: n.exercises ?? [],
+    figures: n.figures ?? [],
+    sources: Object.fromEntries(
+      noteConceptIds(n)
+        .map((id) => [id, conceptById.get(id)?.sources ?? []])
+        .filter(([, ss]) => ss.length),
+    ),
+  };
+}
 
 // ---------------------------------------------------------------------------
 
@@ -275,7 +313,29 @@ ${beatsHeadings}
 ${exercisesSection(n)}## Summary
 
 ## Flashcards
-`;
+${furtherReading(n)}`;
+}
+
+// concept ids this note touches (its beats), used for per-lesson Further reading
+function noteConceptIds(n) {
+  return [...new Set((n.beats ?? []).map((b) => b.concept))];
+}
+
+// Per-lesson "Further reading", generated deterministically from the manifest
+// sources of this note's concepts. The writer never emits citation URLs — this
+// section is stamped from verified sources and left untouched.
+function furtherReading(n) {
+  const seen = new Set();
+  const items = [];
+  for (const id of noteConceptIds(n)) {
+    for (const s of conceptById.get(id)?.sources ?? []) {
+      if (seen.has(s.url)) continue;
+      seen.add(s.url);
+      items.push(`- [${mdEscape(s.title)}](${s.url})${s.note ? ` — ${mdEscape(s.note)}` : ""}`);
+    }
+  }
+  if (!items.length) return "";
+  return `\n## Further reading\n\n${items.join("\n")}\n`;
 }
 
 function exercisesSection(n) {
