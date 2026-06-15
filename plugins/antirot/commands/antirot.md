@@ -48,7 +48,7 @@ Persist those sources back into `.antirot/manifest.json` (set each concept's `so
 ```
 node ${CLAUDE_PLUGIN_ROOT}/scripts/build-artifacts.mjs .antirot/manifest.json --state .antirot/build-state.json --briefs .antirot/briefs
 ```
-Generates: course map (with DAG mermaid), module overviews (+ capstones), glossary stubs, the Resources appendix, skeleton notes (with beat headings, Exercises, a generated **Further reading** section per lesson), and a small **brief** per note under `.antirot/briefs/`.
+Generates: course map (with DAG mermaid), module overviews (+ capstones), the auto-generated **Glossary index** (transcludes each term's definition from its home lesson — no authored glossary), the Resources appendix, skeleton notes (with beat headings, a pre-stamped `^def-<id>` Definition callout per define beat, Exercises, and a generated **Further reading** section), and a small **brief** per note under `.antirot/briefs/`.
 
 ## 6 — Generate (tiered)
 - **≤5 lessons:** write them inline, serially, following the `lesson-writer` rules (read each note's brief at `.antirot/briefs/<slug>.json`; closed vocab; notation; voice; one-new-thing-per-beat; fill exercises with verified solutions; amend-don't-invent; leave the generated Further reading untouched).

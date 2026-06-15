@@ -66,32 +66,29 @@ for (const n of m.notes) {
   alias.set(n.slug, { kind: "note", noteSlug: n.slug, order: n.order });
 }
 for (const c of m.concepts) {
-  // a concept id resolves to its home (lesson) note
+  // a concept id resolves to its home (lesson) note, where its definition lives
   alias.set(c.id, {
     kind: "concept",
     noteSlug: c.homeNote,
     order: orderOfConcept(c.id),
     concept: c.id,
   });
-  if (c.glossary) {
-    alias.set(`${c.id}-glossary`, {
-      kind: "glossary",
-      concept: c.id,
-      blockIds: new Set([`^def-${c.id}`]),
-    });
-  }
 }
 for (const mod of m.modules) {
   alias.set(`${mod.slug}-overview`, { kind: "module", module: mod.slug });
 }
+// structural pages writers may legitimately link
+for (const page of ["Glossary", "Resources"]) alias.set(page, { kind: "page" });
 
-// block-id universe: from manifest note.blockIds + glossary ^def-<id>
+// block-id universe: manifest note.blockIds + each concept's canonical
+// definition block (^def-<id>) which lives in its HOME note (not a glossary).
 const blockIdsByTarget = new Map();
 for (const n of m.notes) {
   blockIdsByTarget.set(n.slug, new Set(n.blockIds ?? []));
 }
-for (const c of m.concepts.filter((c) => c.glossary)) {
-  blockIdsByTarget.set(`${c.id}-glossary`, new Set([`^def-${c.id}`]));
+for (const c of m.concepts) {
+  if (!blockIdsByTarget.has(c.homeNote)) blockIdsByTarget.set(c.homeNote, new Set());
+  blockIdsByTarget.get(c.homeNote).add(`^def-${c.id}`);
 }
 
 // --- notation manifest consistency -----------------------------------------

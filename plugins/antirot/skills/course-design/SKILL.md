@@ -51,7 +51,7 @@ Count the lesson notes. ≤5 → the course is written inline, serially. >5 → 
 
 Correctness is only fully discoverable while writing prose, which happens *after* the manifest is frozen. So the freeze must not be absolute. A lesson-writer that discovers the manifest is wrong returns an **amendment** rather than inventing a link, teaching inline, or omitting. When amendments come back:
 
-- **Trivial** (a clearly-missing prereq edge, a glossary stub to add): ratify into the manifest and re-run only the affected notes.
+- **Trivial** (a clearly-missing prereq edge, a concept to flag for the glossary): ratify into the manifest and re-run only the affected notes.
 - **Structural** (a concept needs splitting, a home is wrong, a cycle was masked): escalate to the human gate — do not auto-apply.
 
 Treat manifest immutability as a parallelization optimization, never as a correctness guarantee.

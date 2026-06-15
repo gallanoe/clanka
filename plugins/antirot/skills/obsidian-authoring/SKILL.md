@@ -54,15 +54,21 @@ Every continuation line of a callout must begin with `>`. To declare a transclud
 2. **Embed it inline** where it belongs in the lesson: `![[assets/<id>.svg]]` with a one-line caption beneath.
 A build step renders the spec to `assets/<id>.svg`; you never write SVG by hand.
 
+## Definitions live in the lesson, not a glossary
+The canonical definition of a concept lives in **the lesson that introduces it** — the `define` beat's `> [!note] Definition ^def-<id>` callout (your skeleton pre-stamps this block; just fill it, don't move or rename `^def-<id>`). There is no separate authored glossary definition.
+- Reference a term: `[[concept-id]]` (jumps to its home lesson) or `[[concept-id#^def-id]]` to land on the exact definition block.
+- Transclude a definition inline where you genuinely need it: `![[concept-id#^def-id]]`.
+- The `Glossary` page is **auto-generated** and transcludes these lesson definitions — never author definitions there.
+
 ## Transclusion
-- `![[concept-glossary#^def-concept]]` embeds a glossary definition. Only target a block id that was actually declared (glossary stubs declare `^def-<id>`). A transclusion to an undeclared block fails the check.
+- `![[note-or-concept#^block-id]]` embeds a block. Only target a block id that exists (every define beat declares `^def-<id>`; plus any `note.blockIds`). A transclusion to an undeclared block fails the check.
 
 ## Flashcards
 Under `## Flashcards`, one per line as `Question :: Answer`. The answer must actually answer the question and be entailed by the lesson body (the reviewer round-trips these).
 
 ## Lesson shape (fill the skeleton)
 The skeleton gives you frontmatter, one `##` heading per beat, a `## Summary`, and a `## Flashcards` section. For each beat:
-1. **DEFINE** beat → intuition (plain language) → `> [!note]` formal definition (declare a block id if it's a glossary concept) → `> [!example]` worked example → `> [!question]` quick check.
+1. **DEFINE** beat → intuition (plain language) → fill the pre-stamped `> [!note] Definition ^def-<id>` callout (the canonical definition; keep the `^def-<id>` block id) → `> [!example]` worked example → `> [!question]` quick check.
 2. **USE** beat → one or two sentences applying the already-defined concept; link it with `[[id]]`.
 3. **PREVIEW** beat → a single `> [!tip]` or `> [!preview]` callout pointing ahead; do **not** teach it.
 

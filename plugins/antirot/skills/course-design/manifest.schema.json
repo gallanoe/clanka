@@ -63,7 +63,7 @@
           "homeNote": { "type": "string", "description": "slug of the note where this concept is canonically defined (the unique `define` site)." },
           "difficulty": { "enum": ["intro", "applied", "theory", "proof"] },
           "criticality": { "enum": ["normal", "critical"], "description": "critical => routed to the stronger model and to claim-level review. Downstream lessons depend on its correctness." },
-          "glossary": { "type": "boolean", "description": "Has a glossary stub + is transcludable." },
+          "glossary": { "type": "boolean", "description": "Appears in the auto-generated Glossary index, which transcludes this concept's canonical definition (^def-<id>) from its home lesson. No separate definition is authored." },
           "groundingRequired": { "type": "boolean", "description": "If true, the generation workflow runs a researcher to attach real sources before this concept is written/reviewed. Set for niche, cutting-edge, low-confidence, or correctness-critical concepts the model may not reliably know." },
           "sources": {
             "type": "array",

@@ -58,12 +58,10 @@ for (const mod of [...m.modules].sort((a, b) => a.order - b.order)) {
   writeFile(join(dir, "00 - Overview.md"), moduleOverview(mod), true);
 }
 
-// --- glossary stubs (one note per glossary concept, declares a block id) ----
-const glossDir = join(outDir, "Appendix", "Glossary");
-mkdirSync(glossDir, { recursive: true });
-for (const c of m.concepts.filter((c) => c.glossary)) {
-  writeFile(join(glossDir, `${c.id}.md`), glossaryStub(c), true);
-}
+// --- glossary: ONE A–Z index page that transcludes each term's canonical
+//     definition from the lesson that introduces it (no duplicate definitions) -
+mkdirSync(join(outDir, "Appendix"), { recursive: true });
+writeFile(join(outDir, "Appendix", "Glossary.md"), glossaryIndex(), true);
 writeFile(join(outDir, "Appendix", "Resources.md"), resourcesStub(), true);
 
 // --- skeleton lesson notes --------------------------------------------------
@@ -148,8 +146,8 @@ ${modLinks}
 
 ## Appendix
 
+- [[Glossary]]
 - [[Resources]]
-- Glossary: see \`Appendix/Glossary/\`
 `;
 }
 
@@ -202,19 +200,30 @@ ${lessons}
 ${capstone}`;
 }
 
-function glossaryStub(c) {
+function glossaryIndex() {
+  // No authored definitions here — each entry transcludes the canonical
+  // definition block (^def-<id>) from the lesson that introduces the concept.
   const fm = frontmatter({
-    title: c.title,
-    aliases: [`${c.id}-glossary`],
+    title: "Glossary",
     type: "glossary",
     tags: ["glossary", `course/${m.course.slug}`],
-    status: "skeleton",
   });
-  // Declares the canonical block id used for transclusion: ^def-<id>
-  return `${fm}# ${c.title}
+  const terms = m.concepts
+    .filter((c) => c.glossary)
+    .sort((a, b) => a.title.localeCompare(b.title));
+  if (!terms.length) return `${fm}# Glossary\n\n_(no glossary terms)_\n`;
+  const entries = terms
+    .map(
+      (c) =>
+        `### ${mdEscape(c.title)}\n\n![[${c.homeNote}#^def-${c.id}]]\n\n[[${c.id}|→ where it's introduced]]`,
+    )
+    .join("\n\n");
+  return `${fm}# Glossary
 
-> [!note] Definition ^def-${c.id}
-> _(to be written — canonical definition of ${c.title}; transcluded wherever this term is used)_
+> [!note] About
+> Each definition is transcluded from the lesson that introduces it — the single canonical source. Follow the link to read it in context.
+
+${entries}
 `;
 }
 
@@ -281,13 +290,16 @@ function skeletonNote(n) {
     .map((b) => {
       const c = conceptById.get(b.concept);
       const label = c ? c.title : b.concept;
-      const tag =
-        b.kind === "define"
-          ? " <!-- define: canonical home for this concept -->"
-          : b.kind === "preview"
-            ? " <!-- preview: forward pointer only, do not teach -->"
-            : "";
-      return `## ${label}${tag}\n`;
+      if (b.kind === "define") {
+        // The canonical definition lives HERE (the home lesson). ^def-<id> is
+        // the single source — transcluded by the Glossary and linkable as
+        // [[<concept>#^def-<id>]]. No separate glossary definition exists.
+        return `## ${label}\n\n> [!note] Definition ^def-${b.concept}\n> _(to be written)_\n`;
+      }
+      if (b.kind === "preview") {
+        return `## ${label}\n\n> [!tip] Coming up\n> _(to be written — forward pointer only; do not teach here)_\n`;
+      }
+      return `## ${label}\n`;
     })
     .join("\n");
   const definesHere = m.concepts
