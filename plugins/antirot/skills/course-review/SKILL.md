@@ -16,6 +16,7 @@ Do not skim a lesson and pronounce it good — that is exactly how LLM judges mi
 - **Theorems / claims** — is the statement right? Does any proof sketch actually hold, or skip the hard step?
 - **Worked examples** — recompute every step yourself; flag any that doesn't follow.
 - **Flashcards** — does the answer answer the question, and is it entailed by the body?
+- **Exercises & solutions** — does each exercise require its declared kind (not a circular restatement)? Recompute computational solutions; confirm conceptual ones are correct, complete, and reachable from the lesson. A wrong solution is worse than a wrong explanation, because the learner self-checks against it.
 - **Pacing** — genuinely one new concept per beat, or are extra concepts smuggled in undefined?
 
 Return `revise` with specific findings on any failure; return `pass` only when you have actually checked the claims.

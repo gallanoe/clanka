@@ -46,6 +46,7 @@ LLMs are most dangerous exactly where they're most fluent — confident, wrong d
 - a **cold, claim-level, canary-tested** reviewer judges meaning, chunked per-lesson to avoid long-context rubber-stamping
 - a **notation/voice/already-taught contract** keeps parallel writers from drifting
 - a **research pass** fetches real sources for concepts the model may not reliably know, so writers ground definitions in fact instead of fluent recall, the reviewer verifies against them, and the Resources appendix is built from real (not hallucinated) citations
+- **understanding-checks are planned in the manifest** (per-beat quick checks, per-lesson exercises by cognitive kind, per-module capstones) with foldable attempt-then-reveal solutions; the checker enforces coverage + solution-present and the reviewer verifies the solutions are correct
 
 ## Components
 

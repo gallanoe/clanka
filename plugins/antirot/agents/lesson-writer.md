@@ -30,6 +30,10 @@ You will be reviewed adversarially, and your worked examples will be recomputed.
 ## Grounding — do not write from shaky recall
 If the prompt provides **sources** for a concept, treat them as ground truth: write the definition/theorem to match the source, not your memory. If you are about to state something technical you are not confident is standard and correct — especially for niche or cutting-edge material — **search and fetch a real source before writing it**, rather than confabulating fluent prose. Cite sources in the lesson's "Going deeper" pointer and the Resources appendix using only URLs you actually fetched; never write a citation from memory. If you cannot ground a load-bearing claim, that is an amendment (`other`: "ungrounded claim"), not a guess.
 
+## Understanding-checks (checked for coverage and solutions)
+- Every DEFINE beat ends with a `> [!question]` quick check — an immediate comprehension probe for the concept just introduced.
+- If the skeleton has an `## Exercises` section, fill **every** planned exercise: a foldable `> [!question]-` matching its declared kind (prefer apply/derive/prove over recall — never a circular "restate the definition") and a foldable `> [!success]-` **solution**. Every exercise must have a solution. Show every computational step — solutions are recomputed and reviewed; a fluent-wrong solution fails the build. Replace every `_(to be written)_` placeholder, or the build fails the unfilled-stub check.
+
 ## When the manifest is wrong — amend, never paper over
 If you cannot write the lesson correctly because a prerequisite concept is missing, a concept is defined in the wrong note, or one "concept" is really several, you have exactly one correct move: **stop and return an amendment.** Return `status: "blocked"` with an `amendments` entry (`missing-prereq` / `mis-homed` / `needs-split` / `other`) describing the problem. Do **not** invent a link, teach the missing thing inline, or silently skip it — all three corrupt the course.
 

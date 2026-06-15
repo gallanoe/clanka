@@ -115,7 +115,21 @@
           },
           "prereqs": { "type": "array", "items": { "type": "string" }, "description": "concept ids the reader must already know" },
           "alreadyTaught": { "type": "array", "items": { "type": "string" }, "description": "prereq concept ids the reader has SEEN in an earlier note: link, do not re-teach." },
-          "blockIds": { "type": "array", "items": { "type": "string" }, "description": "Declared block ids this note defines, e.g. ['^def-confluence']. Transclusion targets must resolve to one of these." }
+          "blockIds": { "type": "array", "items": { "type": "string" }, "description": "Declared block ids this note defines, e.g. ['^def-confluence']. Transclusion targets must resolve to one of these." },
+          "exercises": {
+            "type": "array",
+            "description": "Planned understanding-checks for this lesson, beyond the per-beat quick checks. Each is rendered as a foldable question + a verified foldable solution. Makes exercises checkable (coverage + solution-present) instead of ad-hoc.",
+            "items": {
+              "type": "object",
+              "required": ["concept", "kind"],
+              "additionalProperties": false,
+              "properties": {
+                "concept": { "type": "string", "description": "primary concept tested; must be in this note's linkVocab" },
+                "kind": { "enum": ["recall", "apply", "derive", "prove"], "description": "cognitive level — prefer apply/derive over recall; recall is the per-beat quick check's job" },
+                "interleave": { "type": "array", "items": { "type": "string" }, "description": "optional already-taught concept ids this exercise also draws on (spaced retrieval). Must be lower-order concepts." }
+              }
+            }
+          }
         }
       }
     },
@@ -143,7 +157,16 @@
         "properties": {
           "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
           "title": { "type": "string" },
-          "order": { "type": "integer" }
+          "order": { "type": "integer" },
+          "capstone": {
+            "type": "object",
+            "description": "Optional end-of-module integrative exercise that ties several concepts together. Rendered on the module overview with a foldable solution.",
+            "additionalProperties": false,
+            "properties": {
+              "concepts": { "type": "array", "items": { "type": "string" }, "description": "concept ids the capstone integrates" },
+              "prompt": { "type": "string", "description": "optional seed for the capstone task" }
+            }
+          }
         }
       }
     }

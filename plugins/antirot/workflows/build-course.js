@@ -141,6 +141,11 @@ function writePrompt(n) {
     `BEATS (one new concept per beat, in order; only DEFINE concepts marked DEFINE):`,
     beats,
     ``,
+    `PLANNED EXERCISES (fill each as a foldable question of the stated kind + a verified foldable solution; every define beat also needs a per-beat quick check):`,
+    (n.exercises ?? [])
+      .map((e) => `  - ${e.kind}: ${e.concept}${(e.interleave ?? []).length ? ` (interleave ${e.interleave.join(', ')})` : ''}`)
+      .join('\n') || '  (none beyond per-beat quick checks)',
+    ``,
     `CLOSED LINK VOCABULARY (you may [[link]] ONLY these concept ids):`,
     `  ${(n.linkVocab ?? []).join(', ')}`,
     ``,

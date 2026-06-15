@@ -33,6 +33,16 @@ The design phase converts a vague outline into a **frozen coordination manifest*
 
 Write the result to `.antirot/manifest.json` and confirm it satisfies the schema.
 
+## Understanding-checks
+
+Exercises are planned in the manifest so coverage and solutions are *checkable*, not left to the writer's whim (the same move that made pacing checkable via beats):
+
+- Every define beat carries a per-beat **quick check** (the writer emits it; the checker requires one understanding-check per defined concept).
+- Give each note an `exercises` list — `concept` + cognitive `kind`. **Prefer `apply` / `derive` / `prove` over `recall`** (recall is the quick check's job; a manifest full of recall exercises produces a course that tests memory, not understanding). Optionally `interleave` already-taught (lower-order) concepts for spaced retrieval.
+- Give a module an optional `capstone` integrating several of its concepts — the end-of-module synthesis.
+
+Every exercise and capstone gets a foldable, verified solution at generation time; the checker enforces that solutions exist and the reviewer verifies they're correct. Plan the *kind* well: that is the lever that decides whether the course builds understanding or just quizzes recall.
+
 ## Tiering
 
 Count the lesson notes. ≤5 → the course is written inline, serially. >5 → the generation workflow fans out writers. Either way the manifest is identical; only execution differs.

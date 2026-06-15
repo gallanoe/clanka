@@ -38,8 +38,9 @@ const m = JSON.parse(readFileSync(manifestPath, "utf8"));
 const outDir = resolve(m.course.outDir);
 
 const CALLOUT_ENUM = new Set([
-  "note", "info", "example", "question", "tip", "warning", "summary", "preview",
+  "note", "info", "example", "question", "tip", "warning", "summary", "preview", "success",
 ]);
+const SOLUTION_CALLOUTS = new Set(["success", "example"]);
 const PREVIEW_CALLOUTS = new Set(["preview", "tip"]); // forward pointers allowed here
 
 const findings = []; // {severity, code, note, detail}
@@ -173,6 +174,28 @@ for (const n of [...m.notes].sort((a, b) => a.order - b.order)) {
       err("callout-unknown", n.slug, `unknown callout type [!${c[1]}]`);
   }
 
+  // understanding-checks: coverage + solutions + unfilled stubs
+  const callouts = scanCallouts(lines);
+  const questions = callouts.filter((c) => c.type === "question");
+  const foldableQuestions = questions.filter((c) => c.foldable);
+  const solutions = callouts.filter((c) => SOLUTION_CALLOUTS.has(c.type) && c.foldable);
+  const defineCount = (n.beats ?? []).filter((b) => b.kind === "define").length;
+  const planned = (n.exercises ?? []).length;
+
+  if (defineCount && questions.length < defineCount)
+    err("exercise-coverage", n.slug, `defines ${defineCount} concept(s) but has only ${questions.length} understanding-check(s) — each defined concept needs at least a quick check`);
+  if (planned) {
+    if (!/^##\s+Exercises\s*$/m.test(body))
+      err("exercises-missing", n.slug, `${planned} exercise(s) planned in the manifest but no "## Exercises" section`);
+    if (foldableQuestions.length < planned)
+      err("exercise-coverage", n.slug, `${planned} exercise(s) planned but only ${foldableQuestions.length} foldable exercise callout(s) found`);
+    if (solutions.length < foldableQuestions.length)
+      err("solution-missing", n.slug, `${foldableQuestions.length} foldable exercise(s) but only ${solutions.length} foldable solution callout(s) — every exercise needs a solution`);
+  }
+  for (const c of callouts)
+    if (/to be written/i.test(c.bodyText))
+      err("unfilled-stub", n.slug, `a [!${c.type}] callout still contains a "to be written" placeholder`);
+
   // links
   let mt;
   linkRe.lastIndex = 0;
@@ -224,6 +247,24 @@ for (const n of [...m.notes].sort((a, b) => a.order - b.order)) {
   }
 }
 
+// --- module capstones -------------------------------------------------------
+for (const mod of m.modules) {
+  if (!mod.capstone) continue;
+  const file = join(outDir, `${String(mod.order).padStart(2, "0")} - ${mod.title}`, "00 - Overview.md");
+  if (!existsSync(file)) {
+    err("capstone-missing-file", mod.slug, "module has a capstone but its overview note was not found");
+    continue;
+  }
+  const cs = scanCallouts(readFileSync(file, "utf8").split("\n"));
+  const txt = readFileSync(file, "utf8");
+  if (!/^##\s+Capstone\s*$/m.test(txt))
+    err("capstone-missing", mod.slug, "module.capstone declared but no '## Capstone' section in the overview");
+  if (!cs.some((c) => SOLUTION_CALLOUTS.has(c.type) && c.foldable))
+    err("capstone-no-solution", mod.slug, "capstone has no foldable solution callout");
+  if (cs.some((c) => /to be written/i.test(c.bodyText)))
+    err("unfilled-stub", mod.slug, "capstone still contains a 'to be written' placeholder");
+}
+
 // --- optional external renderers -------------------------------------------
 optionalMermaid();
 optionalKatex();
@@ -255,6 +296,25 @@ function computeCalloutSpans(lines) {
     if (c) { cur = c[1].toLowerCase(); out[i] = cur; continue; }
     if (/^>/.test(lines[i]) && cur) { out[i] = cur; continue; }
     cur = undefined;
+  }
+  return out;
+}
+
+function scanCallouts(lines) {
+  // Returns [{type, foldable, bodyText}] for each callout block. foldable = the
+  // [!type]- / [!type]+ form (used for attempt-then-reveal exercises/solutions).
+  const out = [];
+  const header = /^>\s*\[!([a-zA-Z]+)\]([-+])?/;
+  let cur = null;
+  for (const line of lines) {
+    const h = line.match(header);
+    if (h) {
+      cur = { type: h[1].toLowerCase(), foldable: !!h[2], bodyText: line.replace(header, "") };
+      out.push(cur);
+      continue;
+    }
+    if (/^>/.test(line) && cur) { cur.bodyText += " " + line.replace(/^>\s?/, ""); continue; }
+    cur = null;
   }
   return out;
 }

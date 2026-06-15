@@ -13,15 +13,26 @@ These syntaxes are underrepresented in training data and fail in predictable way
 - Never link a concept taught later (higher `order`) outside a preview callout — that's an illegal forward reference.
 
 ## Callouts (closed enum — others are rejected)
-`note` `info` `example` `question` `tip` `warning` `summary` `preview`. Semantics:
+`note` `info` `example` `question` `tip` `warning` `summary` `preview` `success`. Semantics:
 - `> [!note]` — a definition or key fact
 - `> [!example]` — a worked example
-- `> [!question]` — a quick check / exercise (the per-beat comprehension check)
+- `> [!question]` — a quick check (the per-beat comprehension check) or an exercise
+- `> [!success]` — a solution to an exercise
 - `> [!tip]` / `> [!preview]` — going-deeper or a **forward pointer** (the only place a later concept may be linked)
 - `> [!warning]` — a common mistake
 - `> [!summary]` — the end-of-lesson recap
 
 Every continuation line of a callout must begin with `>`. To declare a transcludable block, append `^block-id` to the callout's first line: `> [!note] Definition ^def-confluence`.
+
+**Foldable callouts** (attempt-then-reveal): append `-` to collapse by default, `+` to expand. Exercises and their solutions are foldable so the learner attempts before revealing:
+
+```
+> [!question]- Exercise — derive: <concept>
+> <the task>
+
+> [!success]- Solution
+> <full worked solution; every computational step shown>
+```
 
 ## LaTeX
 - Inline `$...$`, block `$$...$$`. Use the **notation table's exact symbol** for every recurring object — no substitutes.
@@ -41,6 +52,8 @@ The skeleton gives you frontmatter, one `##` heading per beat, a `## Summary`, a
 1. **DEFINE** beat → intuition (plain language) → `> [!note]` formal definition (declare a block id if it's a glossary concept) → `> [!example]` worked example → `> [!question]` quick check.
 2. **USE** beat → one or two sentences applying the already-defined concept; link it with `[[id]]`.
 3. **PREVIEW** beat → a single `> [!tip]` or `> [!preview]` callout pointing ahead; do **not** teach it.
+
+If the skeleton has an `## Exercises` section, fill every planned exercise: a foldable `> [!question]-` matching its declared kind (recall/apply/derive/prove — prefer apply/derive; do not write a circular "restate the definition" check) and a foldable `> [!success]-` solution with a complete, correct, fully-worked answer. Every exercise must have a solution; computational steps must be verifiable (they will be recomputed). Replace every `_(to be written)_` placeholder.
 
 Then write `## Summary` (a `> [!summary]` recap of the new concepts) and the flashcards. When done, set frontmatter `status: complete` and delete the `> [!info] Skeleton` callout.
 

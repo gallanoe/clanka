@@ -141,13 +141,27 @@ function moduleOverview(mod) {
     .sort((a, b) => a.order - b.order)
     .map((n) => `- [[${n.slug}|${n.title}]]`)
     .join("\n");
+  let capstone = "";
+  if (mod.capstone) {
+    const concepts = (mod.capstone.concepts ?? [])
+      .map((id) => `[[${id}]]`)
+      .join(", ");
+    capstone = `\n## Capstone
+
+> [!question]- Capstone — integrate ${concepts || "this module"}
+> ${mod.capstone.prompt ? mod.capstone.prompt : "_(to be written — a task that requires combining the module's concepts, not just recalling them)_"}
+
+> [!success]- Solution
+> _(to be written — full worked solution; verifiable)_
+`;
+  }
   return `${fm}# ${mod.title}
 
 > [!summary] Module overview
 > Lessons in dependency order.
 
 ${lessons}
-`;
+${capstone}`;
 }
 
 function glossaryStub(c) {
@@ -258,10 +272,26 @@ function skeletonNote(n) {
 > One new concept per beat. Link only within the closed vocabulary. Do not add headings for concepts not listed here.
 
 ${beatsHeadings}
-## Summary
+${exercisesSection(n)}## Summary
 
 ## Flashcards
 `;
+}
+
+function exercisesSection(n) {
+  const ex = n.exercises ?? [];
+  if (!ex.length) return "";
+  const blocks = ex
+    .map((e) => {
+      const c = conceptById.get(e.concept);
+      const label = c ? c.title : e.concept;
+      const inter = (e.interleave ?? []).length
+        ? ` (also draws on ${e.interleave.join(", ")})`
+        : "";
+      return `> [!question]- Exercise — ${e.kind}: ${label}${inter}\n> _(to be written — must require ${e.kind}, not mere restatement)_\n\n> [!success]- Solution\n> _(to be written — full worked solution; computational steps must be verifiable)_`;
+    })
+    .join("\n\n");
+  return `## Exercises\n\n${blocks}\n\n`;
 }
 
 // --- helpers ---------------------------------------------------------------

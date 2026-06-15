@@ -15,6 +15,7 @@ Load the `course-design` skill. Read the outline. Produce a **build manifest** t
 - author the **notation table**, the **voice spec + exemplar passage**, and each note's **alreadyTaught** ledger
 - tag concept `criticality` (`critical` = downstream correctness depends on it) and `difficulty`
 - set `groundingRequired: true` on concepts the model may not reliably know (niche, cutting-edge, low-confidence, or correctness-critical) — these get a real-source research pass before they're written
+- plan understanding-checks: each note's `exercises` (concept + `kind`, preferring apply/derive/prove over recall) and an optional per-module `capstone` — every define beat also gets a per-beat quick check
 - pick `course.outDir` (default `./<Course Title>`); confirm it with the user if ambiguous
 
 Write the manifest to `.antirot/manifest.json`. Sanity-check it parses and satisfies the schema before continuing.
