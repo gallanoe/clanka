@@ -1,6 +1,6 @@
 {
   "name": "antirot",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Turns a high-level curriculum outline into a fully-written, fast-paced, Obsidian-native Markdown course. A design phase builds a frozen coordination manifest (concept DAG, canonical homes, beat structure, notation/voice contract); a generation workflow fans out lesson-writers against it; deterministic checks plus a canary-tested chunked review catch fluent-but-wrong content.",
   "license": "MIT"
 }
