@@ -25,7 +25,7 @@ The design phase converts a vague outline into a **frozen coordination manifest*
 3. **Assign canonical homes.** Each concept gets exactly one `homeNote` — the unique `define` site. A concept seeded as intuition early and formalized later: the *formal* note is the home; the early mention is a `preview`.
 4. **Lay out notes & modules.** Group into modules, assign a global topological `order` to every note (lower order = taught earlier). Give every note a `path` and a kebab-case `slug`.
 5. **Write beats per note.** The ordered concepts the note covers, each tagged define/use/preview. A note defines a concept iff it is that concept's `homeNote`. **Do not create `use` beats for already-taught prerequisites.** A prereq the reader already knows belongs in `prereqs`/`linkVocab` and is linked *inline* at the point you use it — never given its own beat. A beat becomes a section heading, and an already-known concept under its own heading produces a "you have already seen…" recap opening: the single biggest prose regression, and a dead, momentum-killing start to a lesson. Reserve `use` beats for a concept this note genuinely *re-applies as a distinct sub-topic with new substance* (e.g. applying a concept defined earlier in *this* note). `validate-manifest.mjs` warns on any `use` beat whose concept is in `alreadyTaught`.
-6. **Compute the closed `linkVocab`** for each note: its beat concepts + its prereqs + any glossary concept it references. This is the *only* set the lesson-writer may link to — anything else is a build failure, which surfaces missing concepts.
+6. **Compute the closed `linkVocab`** for each note: its beat concepts + its prereqs. This is the *only* set the lesson-writer may link to — anything else is a build failure, which surfaces missing concepts.
 7. **Author the contracts (pillar A):**
    - **notation table** — one canonical LaTeX symbol per recurring object. The single biggest source of cross-lesson drift; freeze it here.
    - **voice** — register, person, and a 1–2 paragraph **exemplar passage**. Writers imitate the exemplar; an adjective list ("fast-paced, clear") does not anchor independent samples. Write the exemplar in the actual voice you want.
@@ -53,7 +53,7 @@ Count the lesson notes. ≤5 → the course is written inline, serially. >5 → 
 
 Correctness is only fully discoverable while writing prose, which happens *after* the manifest is frozen. So the freeze must not be absolute. A lesson-writer that discovers the manifest is wrong returns an **amendment** rather than inventing a link, teaching inline, or omitting. When amendments come back:
 
-- **Trivial** (a clearly-missing prereq edge, a concept to flag for the glossary): ratify into the manifest and re-run only the affected notes.
+- **Trivial** (a clearly-missing prereq edge): ratify into the manifest and re-run only the affected notes.
 - **Structural** (a concept needs splitting, a home is wrong, a cycle was masked): escalate to the human gate — do not auto-apply.
 
 Treat manifest immutability as a parallelization optimization, never as a correctness guarantee.

@@ -3,7 +3,7 @@
 //
 // Reads the approved manifest and writes the structural skeleton of the vault:
 // module dirs, the course-map MOC (with a mermaid DAG generated from the edge
-// list), per-module overview MOCs, glossary stubs, and skeleton note files
+// list), per-module overview MOCs, and skeleton note files
 // carrying frontmatter + beat headings + a `status: skeleton` marker.
 //
 // The LLM never writes these — generating them from the manifest removes whole
@@ -58,10 +58,11 @@ for (const mod of [...m.modules].sort((a, b) => a.order - b.order)) {
   writeFile(join(dir, "00 - Overview.md"), moduleOverview(mod), true);
 }
 
-// --- glossary: ONE A–Z index page that transcludes each term's canonical
-//     definition from the lesson that introduces it (no duplicate definitions) -
+// --- Resources appendix (built from researched sources) --------------------
+// No glossary: definitions are lesson-canonical (^def-<id> in the home lesson)
+// and linked inline ([[concept]] / [[concept#^def-id]]); a separate index page
+// would only duplicate the course.
 mkdirSync(join(outDir, "Appendix"), { recursive: true });
-writeFile(join(outDir, "Appendix", "Glossary.md"), glossaryIndex(), true);
 writeFile(join(outDir, "Appendix", "Resources.md"), resourcesStub(), true);
 
 // --- skeleton lesson notes --------------------------------------------------
@@ -146,7 +147,6 @@ ${modLinks}
 
 ## Appendix
 
-- [[Glossary]]
 - [[Resources]]
 `;
 }
@@ -198,33 +198,6 @@ function moduleOverview(mod) {
 
 ${lessons}
 ${capstone}`;
-}
-
-function glossaryIndex() {
-  // No authored definitions here — each entry transcludes the canonical
-  // definition block (^def-<id>) from the lesson that introduces the concept.
-  const fm = frontmatter({
-    title: "Glossary",
-    type: "glossary",
-    tags: ["glossary", `course/${m.course.slug}`],
-  });
-  const terms = m.concepts
-    .filter((c) => c.glossary)
-    .sort((a, b) => a.title.localeCompare(b.title));
-  if (!terms.length) return `${fm}# Glossary\n\n_(no glossary terms)_\n`;
-  const entries = terms
-    .map(
-      (c) =>
-        `### ${mdEscape(c.title)}\n\n![[${c.homeNote}#^def-${c.id}]]\n\n[[${c.id}|→ where it's introduced]]`,
-    )
-    .join("\n\n");
-  return `${fm}# Glossary
-
-> [!note] About
-> Each definition is transcluded from the lesson that introduces it — the single canonical source. Follow the link to read it in context.
-
-${entries}
-`;
 }
 
 function resourcesStub() {
@@ -295,7 +268,7 @@ function skeletonNote(n) {
         // Arc: motivate -> intuition -> definition. Seed the motivation (from the
         // manifest) BEFORE the definition callout so the section never opens with
         // formalism. The canonical definition lives HERE; ^def-<id> is the single
-        // source (transcluded by the Glossary, linkable as [[<concept>#^def-<id>]]).
+        // source (linkable as [[<concept>#^def-<id>]], transcludable with ![[…]]).
         const motiv = c?.motivation
           ? `${c.motivation}\n`
           : `_(motivate: why this concept exists — to be written)_\n`;

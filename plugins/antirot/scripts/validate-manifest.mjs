@@ -52,7 +52,6 @@ const noteBySlug = index(notes, "slug", "note slug");
 const moduleBySlug = index(modules, "slug", "module slug");
 uniqueField(notes, "order", "note order");
 
-const glossaryIds = new Set(concepts.filter((c) => c.glossary).map((c) => c.id));
 const orderOfConcept = (id) => {
   const home = conceptById.get(id);
   const note = home && noteBySlug.get(home.homeNote);
@@ -114,8 +113,8 @@ for (const n of notes) {
   for (const b of beatConcepts) if (!vocab.has(b)) err("beat-not-in-vocab", n.slug, `beat concept "${b}" missing from linkVocab`);
   for (const p of prereqs) if (conceptById.has(p) && !vocab.has(p)) err("prereq-not-in-vocab", n.slug, `prereq "${p}" missing from linkVocab`);
   for (const v of vocab)
-    if (!beatConcepts.has(v) && !prereqs.has(v) && !glossaryIds.has(v))
-      warn("vocab-extra", n.slug, `linkVocab "${v}" is neither a beat, prereq, nor glossary concept`);
+    if (!beatConcepts.has(v) && !prereqs.has(v))
+      warn("vocab-extra", n.slug, `linkVocab "${v}" is neither a beat nor a prereq concept`);
 
   for (const ex of n.exercises ?? [])
     if (!vocab.has(ex.concept)) err("exercise-out-of-vocab", n.slug, `exercise concept "${ex.concept}" not in linkVocab`);

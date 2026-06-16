@@ -52,7 +52,7 @@ const warn = (code, note, detail) =>
   findings.push({ severity: "warn", code, note, detail });
 
 // --- build the canonical slug universe from the manifest -------------------
-// alias -> { kind: 'concept'|'note'|'glossary'|'module', noteSlug, order, concept? }
+// alias -> { kind: 'concept'|'note'|'page'|'module', noteSlug, order, concept? }
 const alias = new Map();
 const conceptById = new Map(m.concepts.map((c) => [c.id, c]));
 const noteBySlug = new Map(m.notes.map((n) => [n.slug, n]));
@@ -78,10 +78,10 @@ for (const mod of m.modules) {
   alias.set(`${mod.slug}-overview`, { kind: "module", module: mod.slug });
 }
 // structural pages writers may legitimately link
-for (const page of ["Glossary", "Resources"]) alias.set(page, { kind: "page" });
+for (const page of ["Resources"]) alias.set(page, { kind: "page" });
 
 // block-id universe: manifest note.blockIds + each concept's canonical
-// definition block (^def-<id>) which lives in its HOME note (not a glossary).
+// definition block (^def-<id>) which lives in its HOME note.
 const blockIdsByTarget = new Map();
 for (const n of m.notes) {
   blockIdsByTarget.set(n.slug, new Set(n.blockIds ?? []));

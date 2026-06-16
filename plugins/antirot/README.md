@@ -28,7 +28,7 @@ outline
   │
   ▼  research.js ──► fetch real sources for grounding-required concepts ──► persist to manifest
   │
-  ▼  build-artifacts.mjs ──► skeleton (MOCs, frontmatter, DAG mermaid, glossary)
+  ▼  build-artifacts.mjs ──► skeleton (MOCs, frontmatter, DAG mermaid)
   │                          + per-note briefs + per-lesson Further reading + Resources
   ▼  build-course.js workflow ──► lesson-writers (parallel, read briefs, routed by criticality)
   │                               + course-reviewer (claim-level, per lesson) + seam pass
@@ -54,7 +54,7 @@ LLMs are most dangerous exactly where they're most fluent — confident, wrong d
 - a **research pass** fetches real sources for concepts the model may not reliably know, so writers ground definitions in fact instead of fluent recall, the reviewer verifies against them, and the Resources appendix is built from real (not hallucinated) citations
 - **understanding-checks are planned in the manifest** (per-beat quick checks, per-lesson exercises by cognitive kind, per-module capstones) with foldable attempt-then-reveal solutions; the checker enforces coverage + solution-present and the reviewer verifies the solutions are correct
 - **per-lesson Further reading** is stamped into each note from that note's verified sources (deterministic — the model never emits citation URLs)
-- **definitions are lesson-canonical**: a concept is defined once, in the lesson that introduces it (a pre-stamped `^def-<id>` block); references link/jump there (`[[concept#^def-id]]`), and the Glossary is an auto-generated index that *transcludes* those lesson definitions — no duplicated or fragmented definitions
+- **definitions are lesson-canonical**: a concept is defined once, in the lesson that introduces it (a pre-stamped `^def-<id>` block); every reference links/jumps there (`[[concept]]` / `[[concept#^def-id]]`) or transcludes it (`![[concept#^def-id]]`) — no separate glossary, no duplicated or fragmented definitions
 - **motivation is first-class**: every concept carries a `motivation` (why it exists / the prior-concept limitation it resolves); define sections open with it and build intuition *before* the formal definition. Pacing is two axes — `density` (word economy) and `scaffolding` (on-ramp depth) — so "fast" never means "unmotivated" (the checker flags a definition with no motivation before it; the reviewer judges depth)
 - **combinatorial graphs are spec-driven** — writers author a graph spec (never raw SVG), rendered to committed SVG by Graphviz; KaTeX is math-only, so graphs never go through it
 

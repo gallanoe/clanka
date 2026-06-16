@@ -68,11 +68,10 @@ Rule of thumb, mermaid vs figure-spec→SVG: **mermaid** for the standard named 
 2. **Embed it inline** where it belongs in the lesson: `![[assets/<id>.svg]]` with a one-line caption beneath.
 A build step renders the spec to `assets/<id>.svg`; you never write SVG by hand.
 
-## Definitions live in the lesson, not a glossary
-The canonical definition of a concept lives in **the lesson that introduces it** — the `define` beat's `> [!note] Definition ^def-<id>` callout (your skeleton pre-stamps this block; just fill it, don't move or rename `^def-<id>`). There is no separate authored glossary definition.
+## Definitions live in the lesson
+The canonical definition of a concept lives in **the lesson that introduces it** — the `define` beat's `> [!note] Definition ^def-<id>` callout (your skeleton pre-stamps this block; just fill it, don't move or rename `^def-<id>`). There is no separate glossary — the definition lives only here, and every reference points back to it.
 - Reference a term: `[[concept-id]]` (jumps to its home lesson) or `[[concept-id#^def-id]]` to land on the exact definition block.
 - Transclude a definition inline where you genuinely need it: `![[concept-id#^def-id]]`.
-- The `Glossary` page is **auto-generated** and transcludes these lesson definitions — never author definitions there.
 
 ## Transclusion
 - `![[note-or-concept#^block-id]]` embeds a block. Only target a block id that exists (every define beat declares `^def-<id>`; plus any `note.blockIds`). A transclusion to an undeclared block fails the check.
