@@ -9,7 +9,7 @@ Plugin root: `${CLAUDE_PLUGIN_ROOT}`. Runtime state lives in `.antirot/` (gitign
 
 **Key architecture rule:** never inline the manifest into a Workflow `args` call — it can be hundreds of KB and gets silently trimmed. Workflows get small args (paths + a slug list); the agents read their own brief/the manifest from disk.
 
-**Pass `args` as a JSON object value, not a JSON-encoded string.** A stringified `args` reaches the workflow as a bare string with no `.manifestPath`/`.notes`, so the run aborts spuriously (`missing-manifestPath` / `bad-args`). The workflows now defensively coerce a stringified `args` back to an object, but pass it correctly regardless. If a `scriptPath` workflow call fails on args, fix the args shape and **re-invoke the same script** — do **not** reimplement `build-course.js` / `research.js` inline. Hand-authoring an inline equivalent defeats the deterministic pipeline, reintroduces the manifest-trimming bug, and overloads this session; the canned scripts are the contract.
+**Pass `args` as a JSON object value, not a JSON-encoded string.** A stringified `args` reaches the workflow as a bare string with no `.manifestPath`/`.notes`, so the run aborts spuriously (`missing-manifestPath` / `bad-args`). The workflows now defensively coerce a stringified `args` back to an object, but pass it correctly regardless. If a `scriptPath` workflow call fails on args, fix the args shape and **re-invoke the same script** — do **not** reimplement `build-course.js` / `research.js` / `revise.js` inline. Hand-authoring an inline equivalent defeats the deterministic pipeline, reintroduces the manifest-trimming bug, and overloads this session; the canned scripts are the contract. The revision/verification/capstone phase is `revise.js` (step 9) — invoke it, don't rebuild it.
 
 ## 1 — Design (inline, this session)
 Load the `course-design` skill. Read the outline. Produce a **build manifest** that validates against `${CLAUDE_PLUGIN_ROOT}/skills/course-design/manifest.schema.json`:
@@ -77,9 +77,19 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/check.mjs .antirot/manifest.json --report .an
 ```
 Fix every hard error: bad links, forward refs, out-of-vocab links, beat/exercise/solution coverage, citation validity, figure specs. Edit the offending note, or amend the manifest and re-run from step 5 for affected notes only.
 
-## 9 — Resolve amendments & revisions
-- **Amendments** (blocked writers): ratify trivial ones into the manifest + re-run affected notes; escalate structural ones to the gate (step 3).
-- **Revise verdicts** + **seam findings** (reviewer): apply fixes to the named notes, then re-check.
+## 9 — Resolve amendments, revisions & capstones (workflow, don't improvise)
+The build-course workflow returns `{ needsRevision, seamFindings, amendments, blocked }`, and the module **capstone** solutions ship as stubs (build-artifacts stamps the placeholders; writers fill lessons, not overviews). Do **not** hand-roll a revision loop, a verification sweep, or a capstone-fill pass — the `revise.js` workflow owns all three, including a **mandatory** re-verify loop (a reviser fixing one bug can introduce another; spot-checking misses it).
+
+1. **Save** the build-course return value to `.antirot/build-course-result.json`.
+2. **Prep deterministically:**
+   ```
+   node ${CLAUDE_PLUGIN_ROOT}/scripts/route-findings.mjs .antirot/manifest.json --result .antirot/build-course-result.json
+   ```
+   It writes per-note findings files to `.antirot/revisions/<slug>.json`, the shared `_seams.json`, an `_amendments.json`, and `.antirot/revise-args.json` (note + unfilled-capstone lists, with absolute paths).
+3. **Amendments** (`.antirot/revisions/_amendments.json`, NOT auto-applied): ratify trivial ones into the manifest + re-run affected notes from step 5; escalate structural ones to the gate (step 3). Trivial ratifiable case: a note legitimately needs an earlier-taught concept not in its `linkVocab`/`prereqs` — add it.
+4. **Revise + verify + capstones:** if `revise-args.json` has any `notes` or `capstones`, read it and invoke the Workflow tool with `scriptPath: "${CLAUDE_PLUGIN_ROOT}/workflows/revise.js"` and `args` set to that **object** (not a stringified copy). Pass `writerModel` through as `reviserModel` if the user pinned a writer model. The workflow fans out a reviser per flagged note (applies its findings + any seam naming it, under closed-vocab / no-self-link rules), fills each capstone, then re-reviews every touched note and re-revises failures until clean (`maxVerifyRounds`, default 2).
+5. Surface its `stillFailing` (items the verify loop couldn't clear) and `blocked` (revisers that need a plan change) — fix those yourself or escalate to the gate.
+6. **Re-run the checker (step 8). It must pass clean before you report done.**
 
 ## 10 — Report
 Summarize: notes written, what the checker caught and how it was fixed, amendments applied, and — explicitly — residual risk (low-confidence edges that survived, claims the reviewer flagged but couldn't fully verify). Never report "done" without check passing clean.

@@ -36,7 +36,11 @@ outline
   │
   ▼  check.mjs ──► links / slugs / forward-refs / beats / exercises / callouts / citations / figures
   │
-  ▼  resolve amendments & revisions ──► report (with residual risk surfaced)
+  ▼  route-findings.mjs ──► turn review verdicts + seams into per-note findings + revise args
+  │
+  ▼  revise.js workflow ──► reviser per flagged note + capstone writers
+  │                         + MANDATORY verify loop (re-review every touched note, re-revise until clean)
+  ▼  report (with residual risk surfaced)
 ```
 
 > **Scale note:** the workflow never receives the manifest as `args` (it can be hundreds of KB and gets silently trimmed). It gets a small slug list + paths; each lesson-writer reads its own per-note **brief** from `.antirot/briefs/<slug>.json`.
@@ -62,7 +66,7 @@ LLMs are most dangerous exactly where they're most fluent — confident, wrong d
 
 | Kind | Name | Role |
 |---|---|---|
-| command | `/antirot` | Orchestrates design → gate → generate → check |
+| command | `/antirot` | Orchestrates design → gate → generate → check → revise |
 | skill | `course-design` | Pedagogy, DAG, manifest authoring, amendment protocol |
 | skill | `obsidian-authoring` | The exact Obsidian syntax the checker enforces |
 | skill | `lesson-craft` | Writing craft: motivate, build intuition, pace without confusing, design examples |
@@ -73,7 +77,9 @@ LLMs are most dangerous exactly where they're most fluent — confident, wrong d
 | agent | `course-reviewer` | Cold adversarial reviewer (per-lesson + seams); verifies against sources |
 | workflow | `research.js` | Pre-step: fetch real sources for grounding-required concepts |
 | workflow | `build-course.js` | Fan out writers (read per-note briefs) + review |
+| workflow | `revise.js` | Apply review/seam findings + fill capstones, then re-verify every touched note in a loop until clean |
 | script | `build-artifacts.mjs` | Deterministic skeleton + per-note briefs + per-lesson Further reading + Resources |
+| script | `route-findings.mjs` | Turn build-course verdicts/seams/capstones into per-note findings + `revise.js` args |
 | script | `build-figures.mjs` | Render graph specs → committed SVG (Graphviz) |
 | script | `check.mjs` | Deterministic structural / completion / citation / figure checks |
 
