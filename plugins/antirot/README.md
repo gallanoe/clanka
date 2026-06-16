@@ -79,6 +79,8 @@ LLMs are most dangerous exactly where they're most fluent — confident, wrong d
 | workflow | `build-course.js` | Fan out writers (read per-note briefs) + review |
 | workflow | `revise.js` | Apply review/seam findings + fill capstones, then re-verify every touched note in a loop until clean |
 | script | `build-artifacts.mjs` | Deterministic skeleton + per-note briefs + per-lesson Further reading + Resources |
+| script | `merge-sources.mjs` | Persist researcher output into the manifest (unwraps the workflow envelope; sanitizes to schema) |
+| script | `fix-self-links.mjs` | De-link self-owned concept links (the systematic writer forward-ref) — keeps prereq/preview/transclusion links |
 | script | `route-findings.mjs` | Turn build-course verdicts/seams/capstones into per-note findings + `revise.js` args |
 | script | `build-figures.mjs` | Render graph specs → committed SVG (Graphviz) |
 | script | `check.mjs` | Deterministic structural / completion / citation / figure checks |

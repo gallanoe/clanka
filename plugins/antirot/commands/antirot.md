@@ -44,7 +44,11 @@ Build the small grounding list from the manifest: `grounding = concepts.filter(c
 
 If the user asked for a specific research model — e.g. "use Opus for research" — add `researcherModel: "opus"` (or `sonnet`/`fable`/`haiku`) to the args. Omit to default to Sonnet.
 
-Persist those sources back into `.antirot/manifest.json` (set each concept's `sources`). This must happen **before** build-artifacts so Further reading + Resources are generated from real citations.
+Persist those sources back into `.antirot/manifest.json` **deterministically** — save the workflow's return value to `.antirot/research-result.json` and run:
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/merge-sources.mjs .antirot/manifest.json --result .antirot/research-result.json
+```
+It unwraps the `{summary, result, sources}` envelope (the sources are nested at `$.result.sources` — do **not** hand-merge from the top level; that silently drops most concepts), sanitizes each source to the schema, writes the manifest back, and exits non-zero if any `groundingRequired` concept still has no sources. This must run **before** build-artifacts so Further reading + Resources are generated from real citations.
 
 ## 5 — Deterministic skeleton + briefs
 ```
@@ -72,10 +76,15 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/build-figures.mjs .antirot/manifest.json --ou
 Compiles each `antirot-graph` figure spec authored in the lessons into a committed SVG under `<outDir>/assets/` and ensures the embed exists. (Needs `@hpcc-js/wasm` or a system `dot`; warns and skips if absent.)
 
 ## 8 — Check
+First clear the one systematic writer error deterministically — lesson-writers reliably wikilink the concepts their own note defines (`[[set]]` inside the lesson that defines `set`), which the checker counts as illegal self/forward references (this was ~190 of them in one run). Don't hand-fix them:
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/fix-self-links.mjs .antirot/manifest.json
+```
+It de-links only self-owned concept links (keeping prereq links, preview links, and def-block transclusions). Then run the checker:
 ```
 node ${CLAUDE_PLUGIN_ROOT}/scripts/check.mjs .antirot/manifest.json --report .antirot/check-report.json
 ```
-Fix every hard error: bad links, forward refs, out-of-vocab links, beat/exercise/solution coverage, citation validity, figure specs. Edit the offending note, or amend the manifest and re-run from step 5 for affected notes only.
+Fix every remaining hard error: bad links, genuine forward refs, out-of-vocab links, beat/exercise/solution coverage, citation validity, figure specs. Edit the offending note, or amend the manifest and re-run from step 5 for affected notes only.
 
 ## 9 — Resolve amendments, revisions & capstones (workflow, don't improvise)
 The build-course workflow returns `{ needsRevision, seamFindings, amendments, blocked }`, and the module **capstone** solutions ship as stubs (build-artifacts stamps the placeholders; writers fill lessons, not overviews). Do **not** hand-roll a revision loop, a verification sweep, or a capstone-fill pass — the `revise.js` workflow owns all three, including a **mandatory** re-verify loop (a reviser fixing one bug can introduce another; spot-checking misses it).
