@@ -312,7 +312,8 @@ for (const n of [...m.notes].sort((a, b) => a.order - b.order)) {
 // --- module capstones -------------------------------------------------------
 for (const mod of m.modules) {
   if (!mod.capstone) continue;
-  const file = join(outDir, `${String(mod.order).padStart(2, "0")} - ${mod.title}`, "00 - Overview.md");
+  const modDir = `${String(mod.order).padStart(2, "0")} - ${sanitizeFilename(mod.title)}`;
+  const file = join(outDir, modDir, `00 - Overview - ${sanitizeFilename(mod.title)}.md`);
   if (!existsSync(file)) {
     err("capstone-missing-file", mod.slug, "module has a capstone but its overview note was not found");
     continue;
@@ -435,4 +436,13 @@ function has(bin) {
 function valueOf(flag) {
   const i = args.indexOf(flag);
   return i >= 0 ? args[i + 1] : undefined;
+}
+
+// Kept in sync with build-artifacts.mjs sanitizeFilename so the overview path
+// computed here matches the file that was actually written.
+function sanitizeFilename(s) {
+  return String(s)
+    .replace(/[\\/:*?"<>|#^[\]]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }

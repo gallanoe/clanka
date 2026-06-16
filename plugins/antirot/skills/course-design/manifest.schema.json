@@ -93,7 +93,7 @@
         "additionalProperties": false,
         "properties": {
           "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
-          "path": { "type": "string", "description": "Path within outDir, e.g. '01 - Foundations/02-second-topic.md'" },
+          "path": { "type": "string", "description": "Authored hint for the note's location. build-artifacts CANONICALIZES it to '<NN> - <module title>/<NN> - <note title>.md' — filename = the title so Obsidian surfaces it in the sidebar/tabs/graph; the slug stays the stable link ID (a frontmatter alias). The value you author is advisory and gets overwritten." },
           "title": { "type": "string" },
           "module": { "type": "string", "description": "module slug" },
           "order": { "type": "integer", "description": "Global topological index. A `use` link's target must have a strictly lower order." },

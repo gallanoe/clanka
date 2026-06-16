@@ -10,6 +10,11 @@
 // classes of syntax failure (broken mermaid, malformed frontmatter, wrong slugs).
 // Lesson-writers later fill in prose between the beat headings and flip status.
 //
+// It also canonicalizes each note's file path (filename = the note title, folder
+// = the module's "<NN> - <title>") and writes the manifest back, so Obsidian
+// surfaces the title and the slug is purely a stable link ID (a frontmatter
+// alias). Links never use the filename, so this rename is safe.
+//
 //   node build-artifacts.mjs <manifest.json> [--state .antirot/build-state.json]
 //
 // Idempotent: existing notes whose frontmatter says `status: complete` are left
@@ -35,6 +40,24 @@ const conceptById = new Map(m.concepts.map((c) => [c.id, c]));
 const noteBySlug = new Map(m.notes.map((n) => [n.slug, n]));
 const moduleBySlug = new Map(m.modules.map((mod) => [mod.slug, mod]));
 
+// Canonicalize note file paths so Obsidian surfaces the TITLE, not the slug:
+// filename = "<NN> - <title>.md" (NN = the note's position within its module),
+// folder = the module's "<NN> - <title>". The slug stays the stable link ID (a
+// frontmatter alias); nothing links by filename, so renaming is safe. Persist
+// the canonical paths back to the manifest so the briefs, the generation
+// workflow, and check.mjs all resolve the same files.
+{
+  const seqByModule = new Map();
+  for (const n of [...m.notes].sort((a, b) => a.order - b.order)) {
+    const seq = (seqByModule.get(n.module) ?? 0) + 1;
+    seqByModule.set(n.module, seq);
+    const mod = moduleBySlug.get(n.module);
+    const dir = mod ? modDirName(mod) : n.module;
+    n.path = `${dir}/${String(seq).padStart(2, "0")} - ${sanitizeFilename(n.title)}.md`;
+  }
+  writeFileSync(manifestPath, JSON.stringify(m, null, 2));
+}
+
 const state = existsSync(statePath)
   ? JSON.parse(readFileSync(statePath, "utf8"))
   : { notes: {} };
@@ -55,7 +78,7 @@ writeFile(
 for (const mod of [...m.modules].sort((a, b) => a.order - b.order)) {
   const dir = join(outDir, modDirName(mod));
   mkdirSync(dir, { recursive: true });
-  writeFile(join(dir, "00 - Overview.md"), moduleOverview(mod), true);
+  writeFile(join(dir, `${overviewBasename(mod)}.md`), moduleOverview(mod), true);
 }
 
 // --- Resources appendix (built from researched sources) --------------------
@@ -128,7 +151,7 @@ function courseMap() {
   });
   const modLinks = [...m.modules]
     .sort((a, b) => a.order - b.order)
-    .map((mod) => `- [[${mod.slug}-overview|${mod.title}]]`)
+    .map((mod) => `- [[${overviewBasename(mod)}|${mod.title}]]`)
     .join("\n");
   return `${fm}# ${m.course.title}
 
@@ -393,7 +416,27 @@ function yamlScalar(v) {
 }
 
 function modDirName(mod) {
-  return `${String(mod.order).padStart(2, "0")} - ${mod.title}`;
+  return `${String(mod.order).padStart(2, "0")} - ${sanitizeFilename(mod.title)}`;
+}
+
+// Overview note basename. Unique per module (titles are unique) AND sorts first
+// within the module folder via the "00 - " prefix. Uniqueness is required: a
+// shared "00 - Overview.md" across every module collides, and Obsidian can't
+// resolve a [[link]] to one specific colliding-basename note. The Course Map
+// links by this basename, so it resolves deterministically (and survives the
+// course being nested inside a larger vault, unlike a path link).
+function overviewBasename(mod) {
+  return `00 - Overview - ${sanitizeFilename(mod.title)}`;
+}
+
+// Strip characters illegal in filenames / wikilinks (\ / : * ? " < > | # ^ [ ])
+// so a title-based filename is always valid and linkable. Commas, parens,
+// ampersands, dashes are fine and kept.
+function sanitizeFilename(s) {
+  return String(s)
+    .replace(/[\\/:*?"<>|#^[\]]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function escapeLabel(s) {

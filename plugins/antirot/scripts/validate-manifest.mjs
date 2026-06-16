@@ -125,6 +125,18 @@ for (const n of notes) {
   }
 }
 
+// Note filenames are derived from the title within each module; two notes with
+// the same title in one module would collide on disk.
+{
+  const seen = new Map();
+  for (const n of notes) {
+    const key = `${n.module}::${(n.title ?? "").trim().toLowerCase()}`;
+    if (seen.has(key))
+      warn("dup-title-in-module", n.slug, `note title "${n.title}" duplicates "${seen.get(key)}" in module "${n.module}" — their files would collide (filenames are title-based)`);
+    else seen.set(key, n.slug);
+  }
+}
+
 finish();
 
 // ---------------------------------------------------------------------------

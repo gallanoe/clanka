@@ -52,6 +52,8 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/build-artifacts.mjs .antirot/manifest.json --
 ```
 Generates: course map (with DAG mermaid), module overviews (+ capstones), the Resources appendix, skeleton notes (with beat headings, a pre-stamped `^def-<id>` Definition callout per define beat, Exercises, and a generated **Further reading** section), and a small **brief** per note under `.antirot/briefs/`. No glossary — definitions are lesson-canonical (`^def-<id>` in the home lesson) and linked inline.
 
+It also **canonicalizes note file paths** (filename = the note title, folder = the module's `NN - title`) and writes the manifest back, so the slug is purely a stable link ID and Obsidian surfaces the title. Downstream steps read the updated paths from the manifest — build args (step 6) and checks (step 8) pick up the canonical paths automatically.
+
 ## 6 — Generate (tiered)
 - **≤5 lessons:** write them inline, serially, following the `lesson-writer` rules (read each note's brief at `.antirot/briefs/<slug>.json`; closed vocab; notation; voice; one-new-thing-per-beat; fill exercises with verified solutions; amend-don't-invent; leave the generated Further reading untouched).
 - **>5 lessons:** invoke the Workflow tool with `scriptPath: "${CLAUDE_PLUGIN_ROOT}/workflows/build-course.js"` and **small args**:
