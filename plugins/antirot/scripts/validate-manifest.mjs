@@ -98,8 +98,16 @@ for (const n of notes) {
       err("prereq-not-earlier", n.slug, `prereq "${p}" is taught at order ${po} >= this note's ${n.order} (forward reference in the plan)`);
   }
 
-  for (const a of n.alreadyTaught ?? [])
+  const taught = new Set(n.alreadyTaught ?? []);
+  for (const a of taught)
     if (!prereqs.has(a)) warn("alreadytaught-not-prereq", n.slug, `alreadyTaught "${a}" is not in prereqs`);
+
+  // A `use` beat for an already-taught concept becomes an empty section heading,
+  // which the writer fills with a "you have already seen…" recap — the dominant
+  // prose regression. Drop the beat; link the prereq inline instead.
+  for (const b of n.beats ?? [])
+    if (b.kind === "use" && taught.has(b.concept))
+      warn("recap-beat", n.slug, `use-beat "${b.concept}" is already-taught — drop the beat and link it inline; a use-beat for a known concept produces a recap-opening section`);
 
   const vocab = new Set(n.linkVocab ?? []);
   for (const v of vocab) if (!conceptById.has(v)) err("vocab-bad-ref", n.slug, `linkVocab "${v}" is not a concept`);

@@ -83,7 +83,7 @@ Under `## Flashcards`, one per line as `Question :: Answer`. The answer must act
 ## Lesson shape (fill the skeleton)
 The skeleton gives you frontmatter, one `##` heading per beat, a `## Summary`, and a `## Flashcards` section. For each beat:
 1. **DEFINE** beat → intuition (plain language) → fill the pre-stamped `> [!note] Definition ^def-<id>` callout (the canonical definition; keep the `^def-<id>` block id) → `> [!example]` worked example → `> [!question]` quick check.
-2. **USE** beat → one or two sentences applying the already-defined concept; link it with `[[id]]`.
+2. **USE** beat → apply the already-defined concept inline; link it with `[[id]]`. Do **not** write a standalone recap section for it, and do not open the lesson with a prereq round-up ("you have already seen…", "we will not re-introduce…") — link the prereq in the one sentence that uses it and move on. (Already-taught prereqs get no skeleton heading at all; you link them inline.)
 3. **PREVIEW** beat → a single `> [!tip]` or `> [!preview]` callout pointing ahead; do **not** teach it.
 
 If the skeleton has an `## Exercises` section, fill every planned exercise: a foldable `> [!question]-` matching its declared kind (recall/apply/derive/prove — prefer apply/derive; do not write a circular "restate the definition" check) and a foldable `> [!success]-` solution with a complete, correct, fully-worked answer. Every exercise must have a solution; computational steps must be verifiable (they will be recomputed). Replace every `_(to be written)_` placeholder.

@@ -16,7 +16,14 @@ For every `define` beat, write in this order — it is the spine of a good expla
 4. **Worked example.** A minimal but non-trivial instance, every step shown, tied back to the definition. Pick the smallest example that still exercises the idea (not so trivial it's vacuous).
 5. **Quick check.** A `> [!question]` that probes the new concept — something a reader who *gets it* can answer and one who skimmed can't.
 
-A `use` beat skips 1–4: name the already-defined concept, link it (`[[concept]]`), apply it. A `preview` beat is one `> [!tip]` pointer forward — no teaching.
+A `use` beat skips 1–4: name the already-defined concept, link it (`[[concept]]`), apply it — *inline, at the point you use it*. A `preview` beat is one `> [!tip]` pointer forward — no teaching.
+
+## Don't recap prerequisites
+The reader already read the prereqs. Recapping them is the most common way a lesson goes dead.
+- **Open on the problem or the first new concept** — never on a round-up of what came before. A lesson that opens "you have already seen X; you have also already seen Y…" has spent its most valuable real estate (the first screen) on review.
+- **No section for an already-known concept.** If a prereq matters here, link it `[[prereq]]` in the one sentence where it's actually used. That single link *is* the connection; a paragraph explaining it again is filler.
+- Banned phrasings: "you have already seen", "as a refresher", "if you need a refresher", "we will not re-introduce", "recall, from the previous note, that…". (Inside a proof, "recall the test:" pointing at something *in this lesson* is fine — the ban is on recapping *earlier lessons*.)
+- This is the difference between a course that respects the reader's momentum and one that makes them wade through review to reach the new idea.
 
 ## Motivation craft
 - Lead with the **need**, not the name. "Here is X" is weak; "We keep hitting Y, which X fixes" is strong.
@@ -46,4 +53,4 @@ Fast-but-not-confusing = **terse density + standard/rich scaffolding**: economic
 
 ## What good looks like vs the failure
 - **Good:** the reader meets each concept already wanting it, gets a concrete feel, then the precise definition, then sees it work — fast, no wasted words, no gaps.
-- **Failure (what you're avoiding):** concepts dumped in dependency order, each opening with a formal definition, no sense of why, "fast" achieved by cutting the on-ramp. Technically complete, pedagogically dead.
+- **Failure (what you're avoiding):** a lesson that opens by recapping its prerequisites; concepts dumped in dependency order, each opening with a formal definition, no sense of why; "fast" achieved by cutting the on-ramp. Technically complete, pedagogically dead.

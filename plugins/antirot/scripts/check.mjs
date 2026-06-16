@@ -203,7 +203,9 @@ for (const n of [...m.notes].sort((a, b) => a.order - b.order)) {
       .map((b) => conceptById.get(b.concept)?.title?.toLowerCase())
       .filter(Boolean),
   );
-  if (defineTitles.size) {
+  // `lean` scaffolding licenses straight-to-formal (foundational notation notes
+  // legitimately skip the motivation arc), so only enforce this for standard/rich.
+  if (defineTitles.size && m.course.pacing?.scaffolding !== "lean") {
     let section = null, sawProse = false;
     for (const line of lines) {
       const h = line.match(/^##\s+(.+?)\s*$/);
@@ -214,6 +216,21 @@ for (const n of [...m.notes].sort((a, b) => a.order - b.order)) {
         section = null;
       } else if (line.trim()) sawProse = true;
     }
+  }
+
+  // recap-opening heuristic (warn): defensive prereq round-ups are the #1 prose
+  // regression. The structural cause (use-beats for already-taught concepts) is
+  // removed in build-artifacts; this is a backstop for recaps the writer adds
+  // anyway. Phrase list is conservative — it targets the recap idiom for EARLIER
+  // lessons, not legit "recall the test:" pointing at something in this lesson.
+  {
+    // "you have already seen" is a recap only when it OPENS a line/sentence; the
+    // same phrase mid-sentence ("…the way you have already seen") is a fine
+    // one-clause callback. The others are recap idioms anywhere they appear.
+    const recapAnywhere = /we will not re-introduce|as a refresher|if you (need|want) a refresher|by way of (a )?reminder|recall,? from the (previous|earlier) (note|lesson)/i;
+    const recapOpener = /^\s*(>\s*)*you have (also )?already seen\b/i;
+    const hit = lines.find((l) => recapOpener.test(l) || recapAnywhere.test(l));
+    if (hit) warn("recap-prose", n.slug, `defensive prereq recap detected ("${hit.trim().slice(0, 70)}…") — link the prereq inline instead of recapping it`);
   }
 
   // planned figures: spec exists + valid, SVG rendered, embed present

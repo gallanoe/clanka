@@ -286,6 +286,7 @@ function mdEscape(s) {
 }
 
 function skeletonNote(n) {
+  const taught = new Set(n.alreadyTaught ?? []);
   const beatsHeadings = n.beats
     .map((b) => {
       const c = conceptById.get(b.concept);
@@ -303,8 +304,16 @@ function skeletonNote(n) {
       if (b.kind === "preview") {
         return `## ${label}\n\n> [!tip] Coming up\n> _(to be written — forward pointer only; do not teach here)_\n`;
       }
+      // USE beat. An already-taught prereq must NOT get its own top-level
+      // section — an empty heading for a known concept begs a recap paragraph
+      // ("you have already seen…"), the #1 prose regression. The concept stays
+      // in linkVocab and is linked INLINE at the point it is used. A use-beat
+      // for a concept not yet seen (e.g. one defined earlier in THIS note) is a
+      // genuine application sub-topic and keeps its heading.
+      if (taught.has(b.concept)) return null;
       return `## ${label}\n`;
     })
+    .filter((s) => s !== null)
     .join("\n");
   const definesHere = m.concepts
     .filter((c) => c.homeNote === n.slug)
