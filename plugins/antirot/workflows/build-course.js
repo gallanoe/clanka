@@ -17,7 +17,16 @@ export const meta = {
 // writerModel (optional): force every lesson-writer to this model ('opus' |
 // 'sonnet' | 'fable' | 'haiku'). Omit to keep cost-routing (Opus for critical
 // notes, Sonnet otherwise).
-const { manifestPath, outDir, briefsDir, notes, writerModel } = args || {}
+//
+// Defensive: `args` should arrive as a JSON object, but the orchestrator can
+// pass it as a JSON-encoded STRING (a known Workflow footgun). Destructuring a
+// string yields all-undefined and the run aborts as "bad-args". Coerce it back.
+function parseArgs(a) {
+  if (typeof a !== 'string') return a || {}
+  try { const o = JSON.parse(a); log('note: args arrived as a JSON string — coerced to object'); return o }
+  catch { log('warn: args is a non-JSON string — ignoring'); return {} }
+}
+const { manifestPath, outDir, briefsDir, notes, writerModel } = parseArgs(args)
 if (!Array.isArray(notes) || !outDir || !briefsDir) {
   log('missing args (need notes, outDir, briefsDir) — aborting')
   return { error: 'bad-args' }

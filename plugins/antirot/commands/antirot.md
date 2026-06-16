@@ -9,6 +9,8 @@ Plugin root: `${CLAUDE_PLUGIN_ROOT}`. Runtime state lives in `.antirot/` (gitign
 
 **Key architecture rule:** never inline the manifest into a Workflow `args` call — it can be hundreds of KB and gets silently trimmed. Workflows get small args (paths + a slug list); the agents read their own brief/the manifest from disk.
 
+**Pass `args` as a JSON object value, not a JSON-encoded string.** A stringified `args` reaches the workflow as a bare string with no `.manifestPath`/`.notes`, so the run aborts spuriously (`missing-manifestPath` / `bad-args`). The workflows now defensively coerce a stringified `args` back to an object, but pass it correctly regardless. If a `scriptPath` workflow call fails on args, fix the args shape and **re-invoke the same script** — do **not** reimplement `build-course.js` / `research.js` inline. Hand-authoring an inline equivalent defeats the deterministic pipeline, reintroduces the manifest-trimming bug, and overloads this session; the canned scripts are the contract.
+
 ## 1 — Design (inline, this session)
 Load the `course-design` skill. Read the outline. Produce a **build manifest** that validates against `${CLAUDE_PLUGIN_ROOT}/skills/course-design/manifest.schema.json`:
 - extract concepts; write a one-line `motivation` per concept (why it exists / the prior-concept limitation it resolves); build the prereq DAG; every edge gets a calibrated `confidence` (0–1) + one-line `why`

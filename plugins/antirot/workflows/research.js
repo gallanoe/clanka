@@ -8,11 +8,21 @@ export const meta = {
 // Small args — NOT the manifest. { manifestPath, grounding: [{id, title}] }.
 // Researchers read the manifest from disk for course context; nothing large is
 // inlined into the workflow call.
-const grounding = (args && args.grounding) || []
-const manifestPath = args && args.manifestPath
+//
+// Defensive: `args` should arrive as a JSON object, but the orchestrator can
+// pass it as a JSON-encoded STRING (a known Workflow footgun). A string `args`
+// has no `.manifestPath`, so the run would abort spuriously. Coerce it back.
+function parseArgs(a) {
+  if (typeof a !== 'string') return a || {}
+  try { const o = JSON.parse(a); log('note: args arrived as a JSON string — coerced to object'); return o }
+  catch { log('warn: args is a non-JSON string — ignoring'); return {} }
+}
+const A = parseArgs(args)
+const grounding = A.grounding || []
+const manifestPath = A.manifestPath
 // researcherModel (optional): force researchers to this model ('opus' | 'sonnet'
 // | 'fable' | 'haiku'). Omit to default to Sonnet.
-const researcherModel = (args && args.researcherModel) || 'sonnet'
+const researcherModel = A.researcherModel || 'sonnet'
 if (!manifestPath) {
   log('no manifestPath in args — aborting')
   return { error: 'missing-manifestPath' }
