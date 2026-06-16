@@ -69,7 +69,7 @@ const REVIEW = {
         required: ['kind', 'detail'],
         additionalProperties: false,
         properties: {
-          kind: { enum: ['wrong-definition', 'wrong-proof', 'wrong-example', 'wrong-solution', 'pacing', 'forward-ref', 'notation', 'citation', 'other'] },
+          kind: { enum: ['wrong-definition', 'wrong-proof', 'wrong-example', 'wrong-solution', 'pacing', 'unestablished', 'forward-ref', 'notation', 'citation', 'other'] },
           detail: { type: 'string' },
         },
       },
@@ -124,7 +124,8 @@ const results = await pipeline(
       `Adversarially review the lesson note "${n.slug}" at ${notePath(n.path)}. Read its brief at ${briefPath(n.slug)} for the sources, closed vocabulary, the voice exemplar, and the pacing (density + scaffolding). ` +
         `Extract each definition/theorem/worked-example/exercise-solution and verify it in isolation — assume wrong until shown right; recompute computational steps; ground uncertain claims against the brief's sources (or fetch your own) and confirm cited URLs support their claim. ` +
         `Check pacing (one new concept per beat) and that no concept outside the closed vocabulary is used. ` +
-        `Judge prose against the brief's voice exemplar and pacing: flag a recap-opening (a lesson/section opening by re-explaining a known prereq instead of the concept's motivation); for standard/rich scaffolding require motivation + intuition before the formal definition (lean may go straight to formal); flag voice diverging from the exemplar. Do NOT pass it just because it reads fluently, and do NOT over-flag a terse lean note or a one-line prereq link.`,
+        `Judge prose against the brief's voice exemplar and pacing: flag a recap-opening (a lesson/section opening by re-explaining a known prereq instead of the concept's motivation); for standard/rich scaffolding require motivation + intuition before the formal definition (lean may go straight to formal); flag voice diverging from the exemplar. ` +
+        `Also flag (kind="unestablished") any notion the lesson leans on but never builds — defined neither here nor in a prereq, no intuition given — especially a representation shift asserted not established (e.g. "a term is a tree, then a graph" when terms were only ever taught as an inductive grammar). This is invisible to the checker, so it is yours to catch; it is the opposite of a recap. Do NOT pass it just because it reads fluently or the notion feels like "universal background", and do NOT over-flag a terse lean note or a one-line prereq link.`,
       { label: `review:${n.slug}`, phase: 'Review', agentType: 'antirot:course-reviewer', model: 'opus', schema: REVIEW },
     ).then((review) => ({ write: writeResult, review, note: n.slug }))
   },

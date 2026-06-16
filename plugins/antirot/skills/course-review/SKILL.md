@@ -21,6 +21,7 @@ Do not skim a lesson and pronounce it good — that is exactly how LLM judges mi
 - **Prose quality** — judge against the brief's `voice.exemplar` and `pacing` (`density` + `scaffolding`), not a generic ideal:
   - **Opens on the problem, not the prereqs** — a lesson/section opening with a prereq recap ("you have already seen…", "as a refresher…") instead of the concept's motivation is a `revise`.
   - **Motivation → intuition → formal, as scaffolding dictates** — `standard`/`rich` must motivate + build intuition before the definition; `lean` may go straight to formal (don't flag a terse foundational note for it).
+  - **Establishes before it uses** — flag a notion the lesson leans on as if known but never built (not defined here, not a prereq, no intuition). The classic case is a **representation shift** (a term taught as an inductive grammar, then used "as a tree → as a graph" with the picture asserted, not established). The checker is blind to it — the notion is plain prose, not a `[[concept]]` — so it is yours to catch. It's the opposite of a recap: a recap re-explains the known; this fails to explain the relied-upon. Don't dismiss it as "universal background."
   - **Voice matches the exemplar** — judge against the brief's `voice.exemplar`, not your own preference.
   - **Examples carry intuition** — flag decorative examples or examples that always land after every definition; the box is fine, the sequencing is the issue.
   - **Earns its length** — padding/hedging/restatement against a terse density; but a `gentle` course's elaboration is intended, not padding.
@@ -40,6 +41,9 @@ Long-context review has low recall in the middle and drifts toward rubber-stampi
 - **opener/template repetition** — do many lessons open with the same formula sentence (e.g. "Here is the move that makes X…")? Stamped openings read as machine-generated; flag the template so it gets varied.
 
 Do not re-review individual lessons during the seam pass.
+
+## A re-review is not correctness-only
+When you re-review a lesson after a reviser applied fixes (or in any verification sweep), the tight goal is "did the fix land and introduce no new error" — but do **not** narrow the lens to *correctness alone*. A pass scoped to "recompute the math, ignore pacing/intuition" is exactly how an introduce-before-use gap survives every layer: the checker can't see it (it's prose), and a correctness-only reviewer is told not to look. Keep the establishes-before-it-uses lens on in re-reviews too. (This is a real post-mortem: a "terms are trees" assumption passed the writer's reviewer, the checker, *and* a correctness-scoped verification sweep — only a human reading for flow caught it.)
 
 ## Canary calibration
 When a review request includes seeded canary errors (deliberately planted wrong definitions/steps), you must catch them. Failing to is a signal the review is theater rather than reading — surface that. Builds may inject canaries into a copy precisely to test whether the reviewer is engaging.

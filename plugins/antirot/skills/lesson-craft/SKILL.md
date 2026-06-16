@@ -35,6 +35,7 @@ The reader already read the prereqs. Recapping them is the most common way a les
 - **Concrete before abstract.** A specific instance first, then generalize. Don't open with the universally-quantified statement.
 - **Example before definition** when the definition is dense — let the reader pattern-match, then name the pattern.
 - **Analogy with a leash.** An analogy is a fast on-ramp; always say where it breaks so it doesn't become a misconception.
+- **Establish a representation before you reason over it.** If you picture a concept a *new* way — a term *as a tree*, a function *as a curve*, a relation *as a matrix* — introduce that picture explicitly (a sentence or two, ideally a figure) before you use it. The reader met the concept one way; a new representation is a new idea, not free. Asserting "the term, drawn as a tree…" when no lesson ever drew one is the jump that quietly loses readers — and the checker can't catch it, because the picture is prose, not a link.
 - Give the **portable one-liner** — the sentence the reader will repeat to themselves later.
 
 ## Pacing without confusing (the two axes)
