@@ -89,7 +89,7 @@ const SEAMS = {
         required: ['seam', 'detail'],
         additionalProperties: false,
         properties: {
-          seam: { enum: ['notation', 'terminology', 'link', 'redundant-reteach', 'voice'] },
+          seam: { enum: ['notation', 'terminology', 'link', 'redundant-reteach', 'voice', 'opener-repetition'] },
           detail: { type: 'string' },
         },
       },
@@ -121,9 +121,10 @@ const results = await pipeline(
     if (!writeResult || writeResult.status === 'blocked')
       return { write: writeResult, review: null, note: n.slug }
     return agent(
-      `Adversarially review the lesson note "${n.slug}" at ${notePath(n.path)}. Read its brief at ${briefPath(n.slug)} for the sources and closed vocabulary. ` +
+      `Adversarially review the lesson note "${n.slug}" at ${notePath(n.path)}. Read its brief at ${briefPath(n.slug)} for the sources, closed vocabulary, the voice exemplar, and the pacing (density + scaffolding). ` +
         `Extract each definition/theorem/worked-example/exercise-solution and verify it in isolation — assume wrong until shown right; recompute computational steps; ground uncertain claims against the brief's sources (or fetch your own) and confirm cited URLs support their claim. ` +
-        `Check pacing (one new concept per beat) and that no concept outside the closed vocabulary is used. Do NOT pass it just because it reads fluently.`,
+        `Check pacing (one new concept per beat) and that no concept outside the closed vocabulary is used. ` +
+        `Judge prose against the brief's voice exemplar and pacing: flag a recap-opening (a lesson/section opening by re-explaining a known prereq instead of the concept's motivation); for standard/rich scaffolding require motivation + intuition before the formal definition (lean may go straight to formal); flag voice diverging from the exemplar. Do NOT pass it just because it reads fluently, and do NOT over-flag a terse lean note or a one-line prereq link.`,
       { label: `review:${n.slug}`, phase: 'Review', agentType: 'antirot:course-reviewer', model: 'opus', schema: REVIEW },
     ).then((review) => ({ write: writeResult, review, note: n.slug }))
   },
@@ -133,7 +134,8 @@ phase('Cross-check')
 const seam = await agent(
   `Read the whole course at ${outDir} (and ${manifestPath} for the canonical notation table). Look ONLY at cross-lesson seams: ` +
     `(1) notation — one canonical symbol per object everywhere; (2) terminology — same term, same meaning; ` +
-    `(3) redundant re-teaching of already-taught prereqs; (4) voice — one author? Report only seam violations.`,
+    `(3) redundant re-teaching of already-taught prereqs; (4) voice — one author?; ` +
+    `(5) opener-repetition — do many lessons open with the same formula sentence (e.g. "Here is the move that makes X…"), reading as machine-stamped? Report only seam violations.`,
   { label: 'cross-check', phase: 'Cross-check', agentType: 'antirot:course-reviewer', model: 'opus', schema: SEAMS },
 )
 

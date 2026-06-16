@@ -18,7 +18,13 @@ Do not skim a lesson and pronounce it good — that is exactly how LLM judges mi
 - **Flashcards** — does the answer answer the question, and is it entailed by the body?
 - **Exercises & solutions** — does each exercise require its declared kind (not a circular restatement)? Recompute computational solutions; confirm conceptual ones are correct, complete, and reachable from the lesson. A wrong solution is worse than a wrong explanation, because the learner self-checks against it.
 - **Pacing** — genuinely one new concept per beat, or are extra concepts smuggled in undefined?
-- **Motivation & intuition** — does each define section open by motivating the concept (why it exists / what prior limitation it resolves) and build intuition before the formal definition? Jumping straight to formalism, or "fast" achieved by cutting the on-ramp, is a `revise` even when the content is correct.
+- **Prose quality** — judge against the brief's `voice.exemplar` and `pacing` (`density` + `scaffolding`), not a generic ideal:
+  - **Opens on the problem, not the prereqs** — a lesson/section opening with a prereq recap ("you have already seen…", "as a refresher…") instead of the concept's motivation is a `revise`.
+  - **Motivation → intuition → formal, as scaffolding dictates** — `standard`/`rich` must motivate + build intuition before the definition; `lean` may go straight to formal (don't flag a terse foundational note for it).
+  - **Voice matches the exemplar** — judge against the brief's `voice.exemplar`, not your own preference.
+  - **Examples carry intuition** — flag decorative examples or examples that always land after every definition; the box is fine, the sequencing is the issue.
+  - **Earns its length** — padding/hedging/restatement against a terse density; but a `gentle` course's elaboration is intended, not padding.
+  - **Don't over-flag** — a one-line `[[prereq]]` pointer is correct (ban the recap *ledger*, not orientation); honor the manifest's chosen density/scaffolding/voice.
 
 Return `revise` with specific findings on any failure; return `pass` only when you have actually checked the claims.
 
@@ -31,6 +37,7 @@ Long-context review has low recall in the middle and drifts toward rubber-stampi
 - **terminology** — same term, same meaning across lessons
 - **redundant re-teaching** — an already-taught prereq re-explained instead of linked
 - **voice** — does the course read as a single author?
+- **opener/template repetition** — do many lessons open with the same formula sentence (e.g. "Here is the move that makes X…")? Stamped openings read as machine-generated; flag the template so it gets varied.
 
 Do not re-review individual lessons during the seam pass.
 

@@ -25,6 +25,8 @@ Then the **pedagogy** (a script can't judge these):
 8. **Weak exercise plan.** Exercises that are recall where the concept demands apply/derive/prove; a note whose exercises don't actually exercise its hardest concept; missing coverage on a load-bearing concept.
 9. **Grounding gaps.** Niche, cutting-edge, or correctness-critical concepts NOT marked `groundingRequired` (they'll be written from shaky recall) — and, conversely, well-known concepts flagged for grounding for no reason.
 10. **Notation/voice gaps.** Recurring objects missing from the notation table (a drift risk), or a voice exemplar too thin to anchor writers.
+11. **Weak or circular motivations.** A concept whose `motivation` is missing, vacuous, or circular ("the concept of X is what lets you do X"). The writer will have nothing real to open with and will default to a definition-first lesson. Name the concept and point at the actual prior-concept limitation it resolves.
+12. **Scaffolding mismatch.** `course.pacing.scaffolding` set wrong for the material: `lean` over hard theory/proof concepts (readers stranded with no on-ramp) or `rich` over trivial notation (bloated foundations). Flag when the global scaffolding fights the difficulty profile of the concepts.
 
 For each issue: name it, say which concept/edge/note it hits, explain the dependency or error concretely (not "seems off"), and state the smallest fix. Sort your output by impact: a missing prereq or a cycle ranks above a decomposition nit.
 

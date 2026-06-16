@@ -29,6 +29,7 @@ The reader already read the prereqs. Recapping them is the most common way a les
 - Lead with the **need**, not the name. "Here is X" is weak; "We keep hitting Y, which X fixes" is strong.
 - The best motivation is usually the **previous concept's limitation** — the course is a chain of "that almost works, but…". Use the prior beat/lesson as the setup.
 - Tie to a stake the reader already has (a problem from an earlier lesson, a goal of the course). Motivation is a bridge from what they know to what they're about to learn.
+- **Vary the opener.** Don't reach for a stock template ("Here is the move that makes X…", "The first thing to understand is…"). Open on *this* lesson's specific problem in fresh phrasing — a formula sentence stamped across many notes reads as machine-generated even when each instance is fine on its own.
 
 ## Intuition craft
 - **Concrete before abstract.** A specific instance first, then generalize. Don't open with the universally-quantified statement.
